@@ -16,10 +16,10 @@ CCD Algorithm is a Java application that provides an API interface to run a coll
 
 Put all the dependency jars along with ccd-algorithm-1.0-SNAPSHOT.jar in a lib folder
 
-#### Run as Application
+#### Run as an Application
 java -cp lib/ccd-algorithm-1.0-SNAPSHOT.jar edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --data data.txt --alpha 0.0001 --depth 3 --out output/
 
-#### Use as API
+#### Use as an API
 ```java
 File dataFile = new File("data.txt");
 double alpha = 0.0001;
@@ -30,8 +30,8 @@ boolean verbose = true;
 TetradDataSet dataset = new TetradDataSet();
 dataset.readDataFile(dataFile, '\t');
 
-Parameters p = ParameterFactory.buildPcStableParameters(alpha, depth, verbose);
+Parameters params = ParameterFactory.buildPcStableParameters(alpha, depth, verbose);
 
 Algorithm algorithm = new TetradAlgorithm();
-algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, p);
+algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
 ```
