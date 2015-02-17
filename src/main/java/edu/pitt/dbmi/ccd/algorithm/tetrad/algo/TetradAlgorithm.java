@@ -1,14 +1,19 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad.algo;
 
-import edu.cmu.tetrad.data.CovarianceMatrix2;
 import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.search.GesGes;
-import edu.cmu.tetrad.search.IndTestFisherZ;
+import edu.cmu.tetrad.search.IndependenceTest;
 import edu.cmu.tetrad.search.PcStable;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
+import edu.pitt.dbmi.ccd.algorithm.AlgorithmException;
 import edu.pitt.dbmi.ccd.algorithm.data.Dataset;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -18,8 +23,15 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
  */
 public class TetradAlgorithm implements Algorithm {
 
+    private Graph graph;
+
+    private String executionOutput;
+
+    public TetradAlgorithm() {
+    }
+
     @Override
-    public void run(Class algorithm, Class testOfIndependence, Dataset dataset, Parameters parameters) {
+    public void run(Class algorithm, Class testOfIndependence, Dataset dataset, Parameters parameters) throws AlgorithmException {
         if (algorithm == null) {
             throw new IllegalArgumentException("Algorithm class is required.");
         }
@@ -30,22 +42,41 @@ public class TetradAlgorithm implements Algorithm {
         DataSet dataSet = (DataSet) dataset.getDataSet();
         if (algorithm == PcStable.class) {
             if (testOfIndependence == null) {
-                throw new IllegalArgumentException("Test of independence is required.");
+                throw new IllegalArgumentException("Independence test class is required.");
             }
 
-            if (IndTestFisherZ.class == testOfIndependence) {
-                double alpha = 0.001;
-                IndTestFisherZ test = new IndTestFisherZ(new CovarianceMatrix2(dataSet), alpha);
+            IndependenceTest independenceTest = IndependenceTestFactory.buildIndependenceTest(testOfIndependence, dataSet, parameters);
 
-                PcStable pcStable = new PcStable(test);
-                pcStable.setVerbose(true);
-            }
+            // get parameters
+            Integer d = (Integer) parameters.getParameter(PcStableParams.DEPTH);
+            int depth = (d == null) ? 3 : d;
 
+            Boolean b = (Boolean) parameters.getParameter(PcStableParams.VERBOSE);
+            boolean verbose = (b == null) ? false : b;
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            PrintStream out = new PrintStream(bos);
+
+            PcStable pcStable = new PcStable(independenceTest);
+            pcStable.setVerbose(verbose);
+            pcStable.setDepth(depth);
+            pcStable.setOut(out);
+
+            graph = pcStable.search();
+            executionOutput = new String(bos.toByteArray(), StandardCharsets.UTF_8);
         } else if (algorithm == GesGes.class) {
 
         } else {
             throw new IllegalArgumentException(String.format("Unknow algorithm class %s.", algorithm.getName()));
         }
+    }
+
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public String getExecutionOutput() {
+        return executionOutput;
     }
 
 }

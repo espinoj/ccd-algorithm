@@ -19,26 +19,35 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad.algo;
 
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  *
- * Feb 16, 2015 2:07:26 PM
+ * Feb 16, 2015 9:52:23 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public abstract class TetradParameters implements Parameters {
+public class TetradParameterFactory {
 
-    protected final Map<String, Object> params;
-
-    public TetradParameters() {
-        this.params = new HashMap<>();
+    private TetradParameterFactory() {
     }
 
-    @Override
-    public Object getParameter(String name) {
-        return params.get(name);
+    public static Parameters buildPcStableParameters(Double alpha, Integer depth, Boolean verbose) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(PcStableParams.ALPHA, alpha);
+        params.put(PcStableParams.DEPTH, depth);
+        params.put(PcStableParams.VERBOSE, verbose);
+
+        return new Parameters() {
+            private final Map<String, Object> parameters = params;
+
+            @Override
+            public Object getParameter(String name) {
+                return parameters.get(name);
+            }
+        };
     }
 
 }

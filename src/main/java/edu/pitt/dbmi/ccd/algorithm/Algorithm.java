@@ -11,6 +11,6 @@ import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
  */
 public interface Algorithm {
 
-    public void run(Class algorithm, Class testOfIndependence, Dataset dataset, Parameters parameters);
+    public void run(Class algorithm, Class testOfIndependence, Dataset dataset, Parameters parameters) throws AlgorithmException;
 
 }

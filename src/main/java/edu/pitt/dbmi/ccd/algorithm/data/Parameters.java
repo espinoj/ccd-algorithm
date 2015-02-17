@@ -10,6 +10,4 @@ public interface Parameters {
 
     public Object getParameter(String name);
 
-    public void addParameter(String name, Object value);
-
 }
