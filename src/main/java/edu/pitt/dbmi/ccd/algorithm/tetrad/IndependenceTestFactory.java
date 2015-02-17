@@ -16,18 +16,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.algorithm.tetrad.algo;
+package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
-import edu.cmu.tetrad.data.CovarianceMatrix2;
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.search.IndTestFisherZ;
-import edu.cmu.tetrad.search.IndependenceTest;
+import edu.pitt.dbmi.ccd.algorithm.data.IndependenceTest;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
-import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.IndTestFisherZParams;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
 
 /**
  *
- * Feb 16, 2015 2:54:41 PM
+ * Feb 17, 2015 10:48:24 AM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
@@ -36,17 +34,15 @@ public class IndependenceTestFactory {
     private IndependenceTestFactory() {
     }
 
-    public static IndependenceTest buildIndependenceTest(Class independenceTest, DataSet data, Parameters parameters) {
-        IndependenceTest test = null;
+    public static IndependenceTest<edu.cmu.tetrad.search.IndependenceTest> buildTetradIndTest(final Class tetradIndTest, final DataSet data, final Parameters parameters) {
+        return new IndependenceTest<edu.cmu.tetrad.search.IndependenceTest>() {
+            private final edu.cmu.tetrad.search.IndependenceTest test = TetradIndependenceTestFactory.buildIndependenceTest(tetradIndTest, data, parameters);
 
-        if (IndTestFisherZ.class == independenceTest) {
-            Double d = (Double) parameters.getParameter(IndTestFisherZParams.ALPHA);
-            double alpha = (d == null) ? 0.0001 : d;
-
-            test = new IndTestFisherZ(new CovarianceMatrix2(data), alpha);
-        }
-
-        return test;
+            @Override
+            public edu.cmu.tetrad.search.IndependenceTest getIndependenceTest() {
+                return test;
+            }
+        };
     }
 
 }

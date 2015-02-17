@@ -12,17 +12,17 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphFactory;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public class DataFactory {
+public class DataSetFactory {
 
-    public static DataSet semSimulateDataAcyclic(Graph graph, int numOfCases) {
+    public static DataSet buildSemSimulateDataAcyclic(Graph graph, int numOfCases) {
         LargeSemSimulator simulator = new LargeSemSimulator(graph);
         simulator.setOut(System.out);
 
         return simulator.simulateDataAcyclic(numOfCases);
     }
 
-    public static DataSet semSimulateDataAcyclic(int numofVars, double edgesPerNode, int numOfCases) {
-        return semSimulateDataAcyclic(GraphFactory.createRandomDAG(numofVars, edgesPerNode), numOfCases);
+    public static DataSet buildSemSimulateDataAcyclic(int numofVars, double edgesPerNode, int numOfCases) {
+        return buildSemSimulateDataAcyclic(GraphFactory.createRandomDAG(numofVars, edgesPerNode), numOfCases);
     }
 
 }

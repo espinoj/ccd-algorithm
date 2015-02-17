@@ -1,7 +1,8 @@
 package edu.pitt.dbmi.ccd.algorithm.graph;
 
-import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphFactory;
 import edu.cmu.tetrad.graph.Graph;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -17,6 +18,7 @@ public class GraphFactoryTest {
      * Test of createRandomDAG method, of class GraphFactory.
      */
     @Test
+    @Ignore
     public void testCreateRandomDAG() {
         System.out.println("createRandomDAG");
         int numofVars = 3;

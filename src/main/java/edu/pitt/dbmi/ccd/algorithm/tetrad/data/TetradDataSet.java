@@ -1,6 +1,8 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad.data;
 
 import edu.cmu.tetrad.data.DataSet;
+import java.io.File;
+import java.io.IOException;
 
 /**
  *
@@ -10,15 +12,25 @@ import edu.cmu.tetrad.data.DataSet;
  */
 public class TetradDataSet implements edu.pitt.dbmi.ccd.algorithm.data.Dataset<DataSet> {
 
-    private final DataSet dataSet;
+    private DataSet dataSet;
 
-    public TetradDataSet(DataSet dataSet) {
-        this.dataSet = dataSet;
+    public TetradDataSet() {
+    }
+
+    public void readDataFile(File dataset, char delimiter) throws IOException {
+        if (dataset == null) {
+            throw new IllegalArgumentException("Dataset file is required.");
+        }
+        dataSet = DataSetIO.read(delimiter, dataset);
     }
 
     @Override
     public DataSet getDataSet() {
         return dataSet;
+    }
+
+    public void setDataSet(DataSet dataSet) {
+        this.dataSet = dataSet;
     }
 
 }

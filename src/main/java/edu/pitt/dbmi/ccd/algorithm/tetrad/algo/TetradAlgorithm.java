@@ -1,5 +1,6 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad.algo;
 
+import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.search.GesGes;
@@ -45,7 +46,7 @@ public class TetradAlgorithm implements Algorithm {
                 throw new IllegalArgumentException("Independence test class is required.");
             }
 
-            IndependenceTest independenceTest = IndependenceTestFactory.buildIndependenceTest(testOfIndependence, dataSet, parameters);
+            IndependenceTest independenceTest = TetradIndependenceTestFactory.buildIndependenceTest(testOfIndependence, dataSet, parameters);
 
             // get parameters
             Integer d = (Integer) parameters.getParameter(PcStableParams.DEPTH);

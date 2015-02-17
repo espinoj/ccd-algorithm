@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package edu.pitt.dbmi.ccd.algorithm.tetrad.algo;
+package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
@@ -29,9 +29,9 @@ import java.util.Map;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public class TetradParameterFactory {
+public class ParameterFactory {
 
-    private TetradParameterFactory() {
+    private ParameterFactory() {
     }
 
     public static Parameters buildPcStableParameters(Double alpha, Integer depth, Boolean verbose) {

@@ -1,7 +1,7 @@
 package edu.pitt.dbmi.ccd.algorithm.data;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.pitt.dbmi.ccd.algorithm.tetrad.data.DataFactory;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.data.DataSetFactory;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.DataSetIO;
 import java.io.File;
 import java.nio.file.Path;
@@ -34,7 +34,7 @@ public class DataSetIOTest {
         int numofVars = 100;
         double edgesPerNode = 1.0;
         int numOfCases = 50;
-        DataSet dataSet = DataFactory.semSimulateDataAcyclic(numofVars, edgesPerNode, numOfCases);
+        DataSet dataSet = DataSetFactory.buildSemSimulateDataAcyclic(numofVars, edgesPerNode, numOfCases);
         DataSetIO.write(dataSet, delimiter, path.toFile());
     }
 
