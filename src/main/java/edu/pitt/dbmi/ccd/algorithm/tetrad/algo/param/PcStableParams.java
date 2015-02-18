@@ -24,7 +24,7 @@ package edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public interface PcStableParams extends IndTestFisherZParams, TetradParams {
+public interface PcStableParams extends IndTestParams, TetradParams {
 
     /**
      * Depth of the search: the maximum number of conditioning nodes for any

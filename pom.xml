@@ -28,7 +28,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>edu.cmu</groupId>
+            <groupId>edu.cmu.tetrad</groupId>
             <artifactId>lib-tetrad</artifactId>
             <version>5.1.0-11-SNAPSHOT</version>
         </dependency>

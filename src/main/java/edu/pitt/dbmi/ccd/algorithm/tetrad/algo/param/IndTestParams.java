@@ -20,11 +20,11 @@ package edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param;
 
 /**
  *
- * Feb 16, 2015 10:46:08 PM
+ * Feb 18, 2015 2:44:47 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public interface IndTestFisherZParams {
+public interface IndTestParams {
 
     /**
      * The significance level at which independence judgments should be made.

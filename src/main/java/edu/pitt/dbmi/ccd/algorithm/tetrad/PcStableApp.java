@@ -18,6 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
+import edu.cmu.tetrad.search.IndTestChiSquare;
 import edu.cmu.tetrad.search.IndTestFisherZ;
 import edu.cmu.tetrad.search.PcStable;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
@@ -91,12 +92,17 @@ public class PcStableApp {
 
         try {
             TetradDataSet dataset = new TetradDataSet();
-            dataset.readDataFile(dataFile, '\t');
+            dataset.readDataFile(dataFile, ' ');
 
             Parameters p = ParameterFactory.buildPcStableParameters(alpha, depth, true);
 
             TetradAlgorithm algorithm = new TetradAlgorithm();
-            algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, p);
+            if (dataset.getDataSet().isContinuous()) {
+                algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, p);
+            } else {
+                algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, p);
+
+            }
             GraphIO.write(algorithm.getGraph(), false, new File(dirOut, "pc_stable_grph.txt"));
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
