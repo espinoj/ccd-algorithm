@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.GesParams;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,20 +35,52 @@ public class ParameterFactory {
     private ParameterFactory() {
     }
 
+    /**
+     * Wraps Map into Parameters.
+     *
+     * @param parameters Map object
+     * @return Parameters object
+     */
+    public static final Parameters wrapParameters(final Map<String, Object> parameters) {
+        if (parameters == null) {
+            return new Parameters() {
+                Map<String, Object> params = new HashMap<>();
+
+                @Override
+                public Object getParameter(String name) {
+                    return parameters.get(name);
+                }
+            };
+        } else {
+            return new Parameters() {
+                Map<String, Object> params = parameters;
+
+                @Override
+                public Object getParameter(String name) {
+                    return parameters.get(name);
+                }
+            };
+        }
+
+    }
+
     public static Parameters buildPcStableParameters(Double alpha, Integer depth, Boolean verbose) {
-        final Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put(PcStableParams.ALPHA, alpha);
         params.put(PcStableParams.DEPTH, depth);
         params.put(PcStableParams.VERBOSE, verbose);
 
-        return new Parameters() {
-            private final Map<String, Object> parameters = params;
+        return wrapParameters(params);
+    }
 
-            @Override
-            public Object getParameter(String name) {
-                return parameters.get(name);
-            }
-        };
+    public static Parameters buildGesParameters(Double penaltyDiscount, Integer numPatternsToStore, Boolean faithful, Boolean verbose) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put(GesParams.FAITHFUL, faithful);
+        params.put(GesParams.NUM_PATTERN_STORE, numPatternsToStore);
+        params.put(GesParams.PENALTY_DISCOUNT, penaltyDiscount);
+        params.put(GesParams.VERBOSE, verbose);
+
+        return wrapParameters(params);
     }
 
 }

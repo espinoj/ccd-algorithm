@@ -1,17 +1,19 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad.algo;
 
-import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
+import edu.cmu.tetrad.data.CovarianceMatrix5;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.search.GesGes;
+import edu.cmu.tetrad.search.GesGes3;
 import edu.cmu.tetrad.search.IndependenceTest;
 import edu.cmu.tetrad.search.PcStable;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
 import edu.pitt.dbmi.ccd.algorithm.AlgorithmException;
 import edu.pitt.dbmi.ccd.algorithm.data.Dataset;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.GesParams;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -65,13 +67,42 @@ public class TetradAlgorithm implements Algorithm {
 
             graph = pcStable.search();
             executionOutput = new String(bos.toByteArray(), StandardCharsets.UTF_8);
-        } else if (algorithm == GesGes.class) {
+        } else if (algorithm == GesGes3.class) {
+            Double pd = (Double) parameters.getParameter(GesParams.PENALTY_DISCOUNT);
+            double penaltyDiscount = (pd == null) ? 2.0 : pd;
 
+            Integer np = (Integer) parameters.getParameter(GesParams.NUM_PATTERN_STORE);
+            int numPatternsToStore = (np == null) ? 0 : np;
+
+            Boolean f = (Boolean) parameters.getParameter(GesParams.FAITHFUL);
+            boolean faithful = (f == null) ? false : f;
+
+            Boolean v = (Boolean) parameters.getParameter(GesParams.VERBOSE);
+            boolean verbose = (v == null) ? false : v;
+
+            GesGes3 ges;
+            if (dataSet.isContinuous()) {
+                ges = new GesGes3(new CovarianceMatrix5(dataSet));
+                ges.setPenaltyDiscount(penaltyDiscount);
+            } else {
+                ges = new GesGes3(dataSet);
+            }
+            ges.setNumPatternsToStore(numPatternsToStore);
+            ges.setFaithfulnessAssumed(faithful);
+            ges.setVerbose(verbose);
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            PrintStream out = new PrintStream(bos);
+            ges.setOut(out);
+
+            graph = ges.search();
+            executionOutput = new String(bos.toByteArray(), StandardCharsets.UTF_8);
         } else {
             throw new IllegalArgumentException(String.format("Unknow algorithm class %s.", algorithm.getName()));
         }
     }
 
+    @Override
     public Graph getGraph() {
         return graph;
     }

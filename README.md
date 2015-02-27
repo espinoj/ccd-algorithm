@@ -20,8 +20,13 @@ Put all the dependency jars along with ccd-algorithm-1.0-SNAPSHOT.jar in a lib f
 java -cp lib/ccd-algorithm-1.0-SNAPSHOT.jar edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --data data.txt --alpha 0.0001 --depth 3 --out output/
 
 #### Use as an API
-```java
 File dataFile = new File("data.txt");
+File outputFile = new File("graph_out.txt");
+
+boolean writeAsXml = false;
+
+##### PC-Stable
+```java
 double alpha = 0.0001;
 int depth = 3;
 boolean verbose = true;
@@ -34,4 +39,23 @@ Parameters params = ParameterFactory.buildPcStableParameters(alpha, depth, verbo
 
 Algorithm algorithm = new TetradAlgorithm();
 algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
+```
+
+##### GES
+```java
+double penaltyDiscount = 2.0;
+int numPatternsToStore = 0;
+boolean faithful = true;
+boolean verbose = true;
+
+// create parameters for GES
+Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, numPatternsToStore, faithful, verbose);
+
+// run the algorithm
+Algorithm algorithm = new TetradAlgorithm();
+algorithm.run(GesGes3.class, null, dataset, p);
+
+// write out graph
+Graph graph = algorithm.getGraph();
+GraphIO.write(graph, writeAsXml, outputFile);
 ```
