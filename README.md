@@ -21,12 +21,13 @@ java -cp lib/ccd-algorithm-1.0-SNAPSHOT.jar edu.pitt.dbmi.ccd.algorithm.tetrad.P
 
 #### Use as an API
 
-##### Input/Output
+##### Input
 ```java
 File dataFile = new File("data.txt");
-File outputFile = new File("graph_out.txt");
 
-boolean writeAsXml = false;
+// read in tab-delimited dataset
+TetradDataSet dataset = new TetradDataSet();
+dataset.readDataFile(dataFile, '\t');
 ```
 
 ##### PC-Stable
@@ -35,13 +36,16 @@ double alpha = 0.0001;
 int depth = 3;
 boolean verbose = true;
 
-TetradDataSet dataset = new TetradDataSet();
-dataset.readDataFile(dataFile, '\t');
-
+// create parameters for PC-Stable
 Parameters params = ParameterFactory.buildPcStableParameters(alpha, depth, verbose);
 
+// run the PC-Stable algorithm
 Algorithm algorithm = new TetradAlgorithm();
-algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
+if (dataset.getDataSet().isContinuous()) {
+    algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
+} else {
+    algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, params);
+}
 ```
 
 ##### GES
@@ -54,9 +58,15 @@ boolean verbose = true;
 // create parameters for GES
 Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, numPatternsToStore, faithful, verbose);
 
-// run the algorithm
+// run the GES algorithm
 Algorithm algorithm = new TetradAlgorithm();
-algorithm.run(GesGes3.class, null, dataset, p);
+algorithm.run(GesGes3.class, null, dataset, params);
+```
+
+##### Output
+```java
+File outputFile = new File("graph_out.txt");
+boolean writeAsXml = false;
 
 // write out graph
 Graph graph = algorithm.getGraph();
