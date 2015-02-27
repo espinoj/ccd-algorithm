@@ -20,10 +20,14 @@ Put all the dependency jars along with ccd-algorithm-1.0-SNAPSHOT.jar in a lib f
 java -cp lib/ccd-algorithm-1.0-SNAPSHOT.jar edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --data data.txt --alpha 0.0001 --depth 3 --out output/
 
 #### Use as an API
+
+##### Input/Output
+```java
 File dataFile = new File("data.txt");
 File outputFile = new File("graph_out.txt");
 
 boolean writeAsXml = false;
+```
 
 ##### PC-Stable
 ```java
