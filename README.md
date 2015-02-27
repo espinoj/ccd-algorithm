@@ -35,7 +35,6 @@ double alpha = 0.0001;
 int depth = 3;
 boolean verbose = true;
 
-
 TetradDataSet dataset = new TetradDataSet();
 dataset.readDataFile(dataFile, '\t');
 
