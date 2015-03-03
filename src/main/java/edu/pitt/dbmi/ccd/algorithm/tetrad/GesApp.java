@@ -27,6 +27,7 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
 import edu.pitt.dbmi.ccd.algorithm.util.InputArgs;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Date;
 
 /**
  *
@@ -40,9 +41,9 @@ public class GesApp {
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
             + "--data <file> "
             + "--out <dir> "
-            + "--delim <char> "
-            + "--penalty-discount <double> "
-            + "--pattern-store <int> "
+            + "[--delim <char>] "
+            + "[--penalty-discount <double>] "
+            + "[--pattern-store <int>] "
             + "[--verbose] "
             + "[--faithful]";
 
@@ -54,7 +55,7 @@ public class GesApp {
     private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
     private static final String PATTERN_STORE_FLAG = "--pattern-store";
 
-    private static final int NUM_REG_ARGS = 6;
+    private static final int NUM_REG_ARGS = 4;
 
     private static Path dataFile;
     private static Path dirOut;
@@ -75,7 +76,7 @@ public class GesApp {
 
         dataFile = null;
         dirOut = null;
-        delim = (char) -1;
+        delim = '\t';
         verbose = Boolean.FALSE;
         faithful = Boolean.FALSE;
         penaltyDiscount = 2.0;
@@ -115,13 +116,24 @@ public class GesApp {
             if (dirOut == null) {
                 throw new IllegalArgumentException(String.format("Switch %s is required.", OUT_FLAG));
             }
-            if (delim == ((char) -1)) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", DELIM_FLAG));
-            }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
             System.exit(-128);
         }
+
+        System.out.println();
+        System.out.println("================================================================================");
+        System.out.printf("GES (%s)\n", new Date(System.currentTimeMillis()));
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.printf("Dataset: %s\n", dataFile.getFileName().toString());
+        System.out.printf("Out: %s\n", dirOut.getFileName().toString());
+        System.out.printf("Verbose: %s\n", verbose);
+        System.out.printf("Faithful: %s\n", faithful);
+        System.out.printf("Penalty Discount: %s\n", penaltyDiscount);
+        System.out.printf("Number of Patterns To Store: %s\n", numPatternsToStore);
+        System.out.printf("Delimiter: %s\n", delim);
+        System.out.println("================================================================================");
+        System.out.println();
 
         try {
             TetradDataSet dataset = new TetradDataSet();
