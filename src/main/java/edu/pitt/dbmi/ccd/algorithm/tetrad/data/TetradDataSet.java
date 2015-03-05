@@ -17,11 +17,12 @@ public class TetradDataSet implements edu.pitt.dbmi.ccd.algorithm.data.Dataset<D
     public TetradDataSet() {
     }
 
-    public void readDataFile(File dataset, char delimiter) throws IOException {
-        if (dataset == null) {
+    public void readDataFile(File data, char delimiter) throws IOException {
+        if (data == null) {
             throw new IllegalArgumentException("Dataset file is required.");
         }
-        dataSet = DataSetIO.read(delimiter, dataset);
+//        dataSet = DataSetIO.read(delimiter, dataset);
+        dataSet = DataSetIO.read(delimiter, data, true);
     }
 
     @Override
