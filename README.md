@@ -60,7 +60,7 @@ Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, numPatt
 
 // run the GES algorithm
 Algorithm algorithm = new TetradAlgorithm();
-algorithm.run(GesGes3.class, null, dataset, params);
+algorithm.run(GesGes.class, null, dataset, params);
 ```
 
 ##### Output

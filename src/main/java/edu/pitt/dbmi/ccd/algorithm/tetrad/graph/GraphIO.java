@@ -5,6 +5,7 @@ import edu.cmu.tetrad.graph.GraphUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -19,7 +20,7 @@ public class GraphIO {
 
     public static void write(final Graph graph, final boolean xml, final File file) throws IOException {
         Path path = file.toPath();
-        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             if (xml) {
                 writer.write(GraphUtils.graphToXml(graph));
             } else {

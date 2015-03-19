@@ -1,6 +1,5 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad.data;
 
-import edu.cmu.tetrad.data.ColtDataSet;
 import edu.cmu.tetrad.data.ContinuousVariable;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -41,7 +41,8 @@ public class DataSetIO {
 
     public static void write(DataSet dataSet, char delimiter, File file) throws IOException {
         Path path = file.toPath();
-        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             DataWriter.writeRectangularData(dataSet, writer, delimiter);
         }
     }
@@ -65,14 +66,13 @@ public class DataSetIO {
         return dataReader.parseTabular(file);
     }
 
-    public static DataSet read(char delimiter, File file, boolean continuous) throws IOException {
-        byte delim = (byte) delimiter;
-        List<Node> nodes = readInNodes(file, delim, continuous);
-        TetradMatrix tetradMatrix = readInTetradMatrix(file, delim);
-
-        return new ColtDataSet(nodes, tetradMatrix);
-    }
-
+//    public static DataSet read(char delimiter, File file, boolean continuous) throws IOException {
+//        byte delim = (byte) delimiter;
+//        List<Node> nodes = readInNodes(file, delim, continuous);
+//        TetradMatrix tetradMatrix = readInTetradMatrix(file, delim);
+//
+//        return new ColtDataSet(nodes, tetradMatrix);
+//    }
     private static TetradMatrix readInTetradMatrix(File file, byte delimiter) throws IOException {
         return new TetradMatrix(readInData(file, delimiter));
     }

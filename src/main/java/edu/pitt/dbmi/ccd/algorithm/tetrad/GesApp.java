@@ -18,7 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
-import edu.cmu.tetrad.search.GesGes3;
+import edu.cmu.tetrad.search.GesGes;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
@@ -141,8 +141,8 @@ public class GesApp {
 
             Parameters p = ParameterFactory.buildGesParameters(penaltyDiscount, numPatternsToStore, faithful, verbose);
             Algorithm algorithm = new TetradAlgorithm();
-            algorithm.run(GesGes3.class, null, dataset, p);
-            GraphIO.write(algorithm.getGraph(), false, new File(dirOut.toFile(), GesGes3.class.getName() + "_grph.txt"));
+            algorithm.run(GesGes.class, null, dataset, p);
+            GraphIO.write(algorithm.getGraph(), false, new File(dirOut.toFile(), GesGes.class.getName() + "_grph.txt"));
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }

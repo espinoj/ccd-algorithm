@@ -36,7 +36,8 @@ public class TestReadInDataset {
      */
     public static void main(String[] args) {
         try {
-            DataSet dataSet = DataSetIO.read('\t', Paths.get(args[0]).toFile(), true);
+            DataSet dataSet = DataSetIO.read('\t', Paths.get(args[0]).toFile());
+//            DataSet dataSet = DataSetIO.read('\t', Paths.get(args[0]).toFile(), true);
         } catch (IOException exception) {
             exception.printStackTrace(System.err);
         }

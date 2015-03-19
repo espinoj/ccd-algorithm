@@ -21,8 +21,8 @@ public class TetradDataSet implements edu.pitt.dbmi.ccd.algorithm.data.Dataset<D
         if (data == null) {
             throw new IllegalArgumentException("Dataset file is required.");
         }
-//        dataSet = DataSetIO.read(delimiter, dataset);
-        dataSet = DataSetIO.read(delimiter, data, true);
+        dataSet = DataSetIO.read(delimiter, data);
+//        dataSet = DataSetIO.read(delimiter, data, true);
     }
 
     @Override

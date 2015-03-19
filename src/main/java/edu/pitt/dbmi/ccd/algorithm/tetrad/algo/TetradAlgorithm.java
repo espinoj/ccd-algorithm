@@ -3,7 +3,7 @@ package edu.pitt.dbmi.ccd.algorithm.tetrad.algo;
 import edu.cmu.tetrad.data.CovarianceMatrix5;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.search.GesGes3;
+import edu.cmu.tetrad.search.GesGes;
 import edu.cmu.tetrad.search.IndependenceTest;
 import edu.cmu.tetrad.search.PcStable;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
@@ -67,7 +67,7 @@ public class TetradAlgorithm implements Algorithm {
 
             graph = pcStable.search();
             executionOutput = new String(bos.toByteArray(), StandardCharsets.UTF_8);
-        } else if (algorithm == GesGes3.class) {
+        } else if (algorithm == GesGes.class) {
             Double pd = (Double) parameters.getParameter(GesParams.PENALTY_DISCOUNT);
             double penaltyDiscount = (pd == null) ? 2.0 : pd;
 
@@ -80,12 +80,12 @@ public class TetradAlgorithm implements Algorithm {
             Boolean v = (Boolean) parameters.getParameter(GesParams.VERBOSE);
             boolean verbose = (v == null) ? false : v;
 
-            GesGes3 ges;
+            GesGes ges;
             if (dataSet.isContinuous()) {
-                ges = new GesGes3(new CovarianceMatrix5(dataSet));
+                ges = new GesGes(new CovarianceMatrix5(dataSet));
                 ges.setPenaltyDiscount(penaltyDiscount);
             } else {
-                ges = new GesGes3(dataSet);
+                ges = new GesGes(dataSet);
             }
             ges.setNumPatternsToStore(numPatternsToStore);
             ges.setFaithfulnessAssumed(faithful);
