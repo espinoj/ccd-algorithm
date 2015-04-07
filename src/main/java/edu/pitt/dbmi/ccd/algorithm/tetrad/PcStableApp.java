@@ -43,29 +43,32 @@ public class PcStableApp {
 
     private static final String USAGE = "java -cp ccd-algorithm-<version>.jar "
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --data <file> "
-            + "--alpha <double> --depth <int>";
+            + "--out <dir> [--alpha <double>] [--depth <int>] [--verbose]";
 
     private static final String DATA_FLAG = "--data";
     private static final String ALPHA_FLAG = "--alpha";
     private static final String DEPTH_FLAG = "--depth";
+    private static final String VERBOSE_FLAG = "--verbose";
     private static final String OUT_FLAG = "--out";
-
-    private static final int NUM_REG_ARGS = 8;
 
     private static File dataFile;
     private static File dirOut;
     private static Double alpha;
     private static Integer depth;
+    private static Boolean verbose;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        if (args == null || args.length != NUM_REG_ARGS) {
+        if (args == null || args.length == 0) {
             System.err.println(USAGE);
             System.exit(-127);
         }
 
+        alpha = 0.0001;
+        depth = 3;
+        verbose = Boolean.FALSE;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
@@ -79,12 +82,21 @@ public class PcStableApp {
                     case DEPTH_FLAG:
                         depth = new Integer(args[++i]);
                         break;
+                    case VERBOSE_FLAG:
+                        verbose = Boolean.TRUE;
+                        break;
                     case OUT_FLAG:
                         dirOut = getDir(args[++i]);
                         break;
                     default:
                         throw new Exception(String.format("Unknown flag: %s.\n", flag));
                 }
+            }
+            if (dataFile == null) {
+                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_FLAG));
+            }
+            if (dirOut == null) {
+                throw new IllegalArgumentException(String.format("Switch %s is required.", OUT_FLAG));
             }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
@@ -95,7 +107,7 @@ public class PcStableApp {
             TetradDataSet dataset = new TetradDataSet();
             dataset.readDataFile(dataFile, ' ');
 
-            Parameters p = ParameterFactory.buildPcStableParameters(alpha, depth, true);
+            Parameters p = ParameterFactory.buildPcStableParameters(alpha, depth, verbose);
 
             Algorithm algorithm = new TetradAlgorithm();
             if (dataset.getDataSet().isContinuous()) {
@@ -103,7 +115,12 @@ public class PcStableApp {
             } else {
                 algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, p);
             }
-            GraphIO.write(algorithm.getGraph(), false, new File(dirOut, "pc_stable_grph.txt"));
+            String filename = String.format("pc-stable_%s_a%fd%d_%d.txt",
+                    dataFile.getName(),
+                    alpha,
+                    depth,
+                    System.currentTimeMillis());
+            GraphIO.write(algorithm.getGraph(), false, new File(dirOut, filename));
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }

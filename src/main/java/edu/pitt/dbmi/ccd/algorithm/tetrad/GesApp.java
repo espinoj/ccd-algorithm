@@ -55,8 +55,6 @@ public class GesApp {
     private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
     private static final String PATTERN_STORE_FLAG = "--pattern-store";
 
-    private static final int NUM_REG_ARGS = 4;
-
     private static Path dataFile;
     private static Path dirOut;
     private static char delim;
@@ -69,7 +67,7 @@ public class GesApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        if (args == null || args.length < NUM_REG_ARGS) {
+        if (args == null || args.length == 0) {
             System.err.println(USAGE);
             System.exit(-127);
         }
@@ -142,7 +140,13 @@ public class GesApp {
             Parameters p = ParameterFactory.buildGesParameters(penaltyDiscount, numPatternsToStore, faithful, verbose);
             Algorithm algorithm = new TetradAlgorithm();
             algorithm.run(GesGes.class, null, dataset, p);
-            GraphIO.write(algorithm.getGraph(), false, new File(dirOut.toFile(), GesGes.class.getName() + "_grph.txt"));
+
+            String filename = String.format("ges_%s_pd%f_npts%d_%d.txt",
+                    dataFile.getFileName().toString(),
+                    penaltyDiscount,
+                    numPatternsToStore,
+                    System.currentTimeMillis());
+            GraphIO.write(algorithm.getGraph(), false, new File(dirOut.toFile(), filename));
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }
