@@ -115,12 +115,11 @@ public class PcStableApp {
             } else {
                 algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, p);
             }
-            String filename = String.format("pc-stable_%s_a%fd%d_%d.txt",
+            String filename = String.format("pc-stable_%s_%d.txt",
                     dataFile.getName(),
-                    alpha,
-                    depth,
                     System.currentTimeMillis());
-            GraphIO.write(algorithm.getGraph(), false, new File(dirOut, filename));
+//            GraphIO.write(algorithm.getGraph(), false, new File(dirOut, filename));
+            GraphIO.write(algorithm.getGraph(), p, PcStable.class, new File(dirOut, filename));
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }

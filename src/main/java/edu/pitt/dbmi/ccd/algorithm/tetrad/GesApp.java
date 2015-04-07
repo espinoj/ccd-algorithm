@@ -141,12 +141,11 @@ public class GesApp {
             Algorithm algorithm = new TetradAlgorithm();
             algorithm.run(GesGes.class, null, dataset, p);
 
-            String filename = String.format("ges_%s_pd%f_npts%d_%d.txt",
+            String filename = String.format("ges_%s_%d.txt",
                     dataFile.getFileName().toString(),
-                    penaltyDiscount,
-                    numPatternsToStore,
                     System.currentTimeMillis());
-            GraphIO.write(algorithm.getGraph(), false, new File(dirOut.toFile(), filename));
+//            GraphIO.write(algorithm.getGraph(), false, new File(dirOut.toFile(), filename));
+            GraphIO.write(algorithm.getGraph(), p, GesGes.class, new File(dirOut.toFile(), filename));
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }
