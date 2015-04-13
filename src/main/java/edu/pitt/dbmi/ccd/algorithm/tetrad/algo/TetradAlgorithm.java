@@ -14,9 +14,7 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.GesParams;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
-import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -28,9 +26,10 @@ public class TetradAlgorithm implements Algorithm {
 
     private Graph graph;
 
-    private String executionOutput;
+    private PrintStream executionOutput;
 
     public TetradAlgorithm() {
+        this.executionOutput = null;
     }
 
     @Override
@@ -40,6 +39,9 @@ public class TetradAlgorithm implements Algorithm {
         }
         if (dataset == null || !(dataset instanceof TetradDataSet)) {
             throw new IllegalArgumentException("TetradDataSet is required.");
+        }
+        if (parameters == null) {
+            throw new IllegalArgumentException("Parameters are required.");
         }
 
         DataSet dataSet = (DataSet) dataset.getDataSet();
@@ -53,50 +55,47 @@ public class TetradAlgorithm implements Algorithm {
             // get parameters
             Integer d = (Integer) parameters.getParameter(PcStableParams.DEPTH);
             int depth = (d == null) ? 3 : d;
-
             Boolean b = (Boolean) parameters.getParameter(PcStableParams.VERBOSE);
             boolean verbose = (b == null) ? false : b;
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            PrintStream out = new PrintStream(bos);
 
             PcStable pcStable = new PcStable(independenceTest);
             pcStable.setVerbose(verbose);
             pcStable.setDepth(depth);
-            pcStable.setOut(out);
+            if (executionOutput != null) {
+                pcStable.setOut(executionOutput);
+            }
 
             graph = pcStable.search();
-            executionOutput = new String(bos.toByteArray(), StandardCharsets.UTF_8);
+            if (executionOutput != null) {
+                executionOutput.println();
+            }
         } else if (algorithm == GesGes.class) {
+            // get parameters
             Double pd = (Double) parameters.getParameter(GesParams.PENALTY_DISCOUNT);
             double penaltyDiscount = (pd == null) ? 2.0 : pd;
-
-            Integer np = (Integer) parameters.getParameter(GesParams.NUM_PATTERN_STORE);
-            int numPatternsToStore = (np == null) ? 0 : np;
-
             Boolean f = (Boolean) parameters.getParameter(GesParams.FAITHFUL);
             boolean faithful = (f == null) ? false : f;
-
             Boolean v = (Boolean) parameters.getParameter(GesParams.VERBOSE);
             boolean verbose = (v == null) ? false : v;
 
             GesGes ges;
-            if (dataSet.isContinuous()) {
+            if (dataset.isContinuous()) {
                 ges = new GesGes(new CovarianceMatrix5(dataSet));
                 ges.setPenaltyDiscount(penaltyDiscount);
             } else {
                 ges = new GesGes(dataSet);
             }
-            ges.setNumPatternsToStore(numPatternsToStore);
+            ges.setNumPatternsToStore(0);  // always set to zero
             ges.setFaithfulnessAssumed(faithful);
             ges.setVerbose(verbose);
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            PrintStream out = new PrintStream(bos);
-            ges.setOut(out);
+            if (executionOutput != null) {
+                ges.setOut(executionOutput);
+            }
 
             graph = ges.search();
-            executionOutput = new String(bos.toByteArray(), StandardCharsets.UTF_8);
+            if (executionOutput != null) {
+                executionOutput.println();
+            }
         } else {
             throw new IllegalArgumentException(String.format("Unknow algorithm class %s.", algorithm.getName()));
         }
@@ -107,8 +106,9 @@ public class TetradAlgorithm implements Algorithm {
         return graph;
     }
 
-    public String getExecutionOutput() {
-        return executionOutput;
+    @Override
+    public void setExecutionOutput(PrintStream executionOutput) {
+        this.executionOutput = executionOutput;
     }
 
 }

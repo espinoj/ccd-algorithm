@@ -3,6 +3,7 @@ package edu.pitt.dbmi.ccd.algorithm;
 import edu.cmu.tetrad.graph.Graph;
 import edu.pitt.dbmi.ccd.algorithm.data.Dataset;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
+import java.io.PrintStream;
 
 /**
  *
@@ -15,5 +16,7 @@ public interface Algorithm {
     public void run(Class algorithm, Class testOfIndependence, Dataset dataset, Parameters parameters) throws AlgorithmException;
 
     public Graph getGraph();
+
+    public void setExecutionOutput(PrintStream executionOutput);
 
 }

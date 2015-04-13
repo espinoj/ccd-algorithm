@@ -26,12 +26,14 @@ import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
-import java.io.File;
-import java.io.FileNotFoundException;
+import edu.pitt.dbmi.ccd.algorithm.util.InputArgs;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 /**
  *
@@ -41,21 +43,28 @@ import java.nio.file.Paths;
  */
 public class PcStableApp {
 
-    private static final String USAGE = "java -cp ccd-algorithm-<version>.jar "
-            + "edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --data <file> "
-            + "--out <dir> [--alpha <double>] [--depth <int>] [--verbose]";
+    private static final String USAGE = "java -cp ccd-algorithm.jar "
+            + "edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp "
+            + "--data <file> "
+            + "--out <dir> "
+            + "[--alpha <double>] "
+            + "[--depth <int>] "
+            + "[--continuous]"
+            + "[--verbose]";
 
     private static final String DATA_FLAG = "--data";
     private static final String ALPHA_FLAG = "--alpha";
     private static final String DEPTH_FLAG = "--depth";
+    private static final String CONTINUOUS_FLAG = "--continuous";
     private static final String VERBOSE_FLAG = "--verbose";
     private static final String OUT_FLAG = "--out";
 
-    private static File dataFile;
-    private static File dirOut;
+    private static Path dataFile;
+    private static Path dirOut;
     private static Double alpha;
     private static Integer depth;
     private static Boolean verbose;
+    private static boolean continuous;
 
     /**
      * @param args the command line arguments
@@ -68,13 +77,14 @@ public class PcStableApp {
 
         alpha = 0.0001;
         depth = 3;
+        continuous = false;
         verbose = Boolean.FALSE;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
                 switch (flag) {
                     case DATA_FLAG:
-                        dataFile = getFile(args[++i]);
+                        dataFile = InputArgs.getPathFile(args[++i]);
                         break;
                     case ALPHA_FLAG:
                         alpha = new Double(args[++i]);
@@ -82,11 +92,14 @@ public class PcStableApp {
                     case DEPTH_FLAG:
                         depth = new Integer(args[++i]);
                         break;
+                    case CONTINUOUS_FLAG:
+                        continuous = true;
+                        break;
                     case VERBOSE_FLAG:
                         verbose = Boolean.TRUE;
                         break;
                     case OUT_FLAG:
-                        dirOut = getDir(args[++i]);
+                        dirOut = Paths.get(args[++i]);
                         break;
                     default:
                         throw new Exception(String.format("Unknown flag: %s.\n", flag));
@@ -100,53 +113,52 @@ public class PcStableApp {
             }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
+            System.exit(-127);
+        }
+
+        // create output file
+        String fileName = String.format("pc-stable_%falpha_%ddepth_%d.txt",
+                alpha, depth, System.currentTimeMillis());
+        Path fileOut = Paths.get(dirOut.toString(), fileName);
+        try {
+            if (!Files.exists(dirOut)) {
+                Files.createDirectory(dirOut);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace(System.err);
             System.exit(-128);
         }
 
-        try {
+        try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(fileOut, StandardOpenOption.CREATE)))) {
+            // print out the parameters
+            printOutParameters(stream);
+
+            // read in the dataset
             TetradDataSet dataset = new TetradDataSet();
-            dataset.readDataFile(dataFile, ' ');
+            dataset.readDataFile(dataFile, '\t', continuous);
 
-            Parameters p = ParameterFactory.buildPcStableParameters(alpha, depth, verbose);
+            // build the parameters
+            Parameters params = ParameterFactory.buildPcStableParameters(alpha, depth, verbose);
 
+            // run algorithm
             Algorithm algorithm = new TetradAlgorithm();
-            if (dataset.getDataSet().isContinuous()) {
-                algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, p);
+            algorithm.setExecutionOutput(stream);
+            if (continuous) {
+                algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
             } else {
-                algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, p);
+                algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, params);
             }
-            String filename = String.format("pc-stable_%s_%d.txt",
-                    dataFile.getName(),
-                    System.currentTimeMillis());
-//            GraphIO.write(algorithm.getGraph(), false, new File(dirOut, filename));
-            GraphIO.write(algorithm.getGraph(), p, PcStable.class, new File(dirOut, filename));
+            GraphIO.write(algorithm.getGraph(), false, stream);
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }
     }
 
-    public static File getFile(String fileName) throws FileNotFoundException {
-        Path path = Paths.get(fileName);
-        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-            if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-                throw new FileNotFoundException(String.format("'%s' is not a file.\n", fileName));
-            }
-            return path.toFile();
-        } else {
-            throw new FileNotFoundException(String.format("Unable to find file: %s.\n", fileName));
-        }
-    }
-
-    public static File getDir(String fileName) throws FileNotFoundException {
-        Path path = Paths.get(fileName);
-        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-            if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-                throw new FileNotFoundException(String.format("'%s' is not a directory.\n", fileName));
-            }
-            return path.toFile();
-        } else {
-            throw new FileNotFoundException(String.format("Unable to find directory: %s.\n", fileName));
-        }
+    private static void printOutParameters(PrintStream stream) {
+        stream.println("Graph Parameters:");
+        stream.println(String.format("depth = %d", depth));
+        stream.println(String.format("alpha = %f", alpha));
+        stream.println();
     }
 
 }

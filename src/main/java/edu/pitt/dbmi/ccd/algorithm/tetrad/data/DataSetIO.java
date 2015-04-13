@@ -7,7 +7,8 @@ import edu.cmu.tetrad.data.DataWriter;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.Node;
-import edu.cmu.tetrad.util.TetradMatrix;
+import edu.cmu.tetradproj.boxdata.BoxDataSet;
+import edu.cmu.tetradproj.boxdata.DoubleDataBox;
 import edu.pitt.dbmi.ccd.algorithm.util.FileTools;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,6 +48,12 @@ public class DataSetIO {
         }
     }
 
+    public static void write(DataSet dataSet, char delimiter, Path path) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            DataWriter.writeRectangularData(dataSet, writer, delimiter);
+        }
+    }
+
     public static DataSet read(char delimiter, File file) throws IOException {
         DataReader dataReader = new DataReader();
         switch (delimiter) {
@@ -66,24 +73,25 @@ public class DataSetIO {
         return dataReader.parseTabular(file);
     }
 
-//    public static DataSet read(char delimiter, File file, boolean continuous) throws IOException {
-//        byte delim = (byte) delimiter;
-//        List<Node> nodes = readInNodes(file, delim, continuous);
-//        TetradMatrix tetradMatrix = readInTetradMatrix(file, delim);
-//
-//        return new ColtDataSet(nodes, tetradMatrix);
-//    }
-    private static TetradMatrix readInTetradMatrix(File file, byte delimiter) throws IOException {
-        return new TetradMatrix(readInData(file, delimiter));
+    public static DataSet read(Path file, boolean continuous, char delimiter) throws IOException {
+        byte delim = (byte) delimiter;
+        List<Node> nodes = readInNodes(file, delim, continuous);
+        DoubleDataBox doubleDataBox = readDoubleDataBox(file, delim);
+
+        return new BoxDataSet(doubleDataBox, nodes);
     }
 
-    private static double[][] readInData(File file, byte delimiter) throws IOException {
+    private static DoubleDataBox readDoubleDataBox(Path file, byte delimiter) throws IOException {
+        return new DoubleDataBox(readInData(file, delimiter));
+    }
+
+    private static double[][] readInData(Path file, byte delimiter) throws IOException {
         int numRow = FileTools.countLine(file) - 1;
         int numCol = FileTools.countColumn(file, delimiter);
 
         double[][] data = new double[numRow][numCol];
 
-        try (FileChannel fc = new RandomAccessFile(file, "r").getChannel()) {
+        try (FileChannel fc = new RandomAccessFile(file.toFile(), "r").getChannel()) {
             MappedByteBuffer buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
             // skip the header
@@ -117,10 +125,20 @@ public class DataSetIO {
         return data;
     }
 
-    private static List<Node> readInNodes(File file, byte delimiter, boolean continuous) throws IOException {
+    /**
+     * Extract variables from tabular dataset.
+     *
+     * @param file - tabular dataset
+     * @param delimiter - character that separate each variables, usually a
+     * space.
+     * @param continuous - true if the dataset has continuous variables.
+     * @return a list of nodes (variables)
+     * @throws IOException when file cannot be read in
+     */
+    private static List<Node> readInNodes(Path file, byte delimiter, boolean continuous) throws IOException {
         List<Node> vars = new LinkedList<>();
 
-        try (FileChannel fc = new RandomAccessFile(file, "r").getChannel()) {
+        try (FileChannel fc = new RandomAccessFile(file.toFile(), "r").getChannel()) {
             MappedByteBuffer buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             StringBuilder dataBuilder = new StringBuilder();
             while (buffer.hasRemaining()) {

@@ -24,7 +24,7 @@ package edu.pitt.dbmi.ccd.algorithm.data;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public interface IndependenceTest<T> {
+public interface TestOfIndependence<T> {
 
     public T getIndependenceTest();
 

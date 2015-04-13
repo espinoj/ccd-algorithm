@@ -27,7 +27,7 @@ package edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param;
 public interface GesParams extends TetradParams {
 
     /**
-     * True if we assume the graph is faithful.
+     * True if we assume the graph is faithful (exclude zero correlation edges).
      */
     public static String FAITHFUL = "faithful";
 
@@ -35,10 +35,5 @@ public interface GesParams extends TetradParams {
      * The BIC penalty is multiplied by this (for continuous variables).
      */
     public static String PENALTY_DISCOUNT = "penaltyDiscount";
-
-    /**
-     * The number of top patterns to store.
-     */
-    public static String NUM_PATTERN_STORE = "numPatternsStore";
 
 }

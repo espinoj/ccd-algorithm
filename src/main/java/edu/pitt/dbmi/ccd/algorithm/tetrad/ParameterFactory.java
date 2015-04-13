@@ -73,10 +73,9 @@ public class ParameterFactory {
         return wrapParameters(params);
     }
 
-    public static Parameters buildGesParameters(Double penaltyDiscount, Integer numPatternsToStore, Boolean faithful, Boolean verbose) {
+    public static Parameters buildGesParameters(Double penaltyDiscount, Boolean faithful, Boolean verbose) {
         final Map<String, Object> params = new HashMap<>();
         params.put(GesParams.FAITHFUL, faithful);
-        params.put(GesParams.NUM_PATTERN_STORE, numPatternsToStore);
         params.put(GesParams.PENALTY_DISCOUNT, penaltyDiscount);
         params.put(GesParams.VERBOSE, verbose);
 

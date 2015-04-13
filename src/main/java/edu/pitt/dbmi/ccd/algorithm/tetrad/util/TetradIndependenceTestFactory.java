@@ -18,7 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.algorithm.tetrad.util;
 
-import edu.cmu.tetrad.data.CovarianceMatrix2;
+import edu.cmu.tetrad.data.CovarianceMatrix5;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.search.IndTestChiSquare;
 import edu.cmu.tetrad.search.IndTestFisherZ;
@@ -43,7 +43,7 @@ public class TetradIndependenceTestFactory {
         Double d = (Double) parameters.getParameter(IndTestParams.ALPHA);
         double alpha = (d == null) ? 0.0001 : d;
         if (IndTestFisherZ.class == independenceTest) {
-            test = new IndTestFisherZ(new CovarianceMatrix2(data), alpha);
+            test = new IndTestFisherZ(new CovarianceMatrix5(data), alpha);
         } else if (IndTestChiSquare.class == independenceTest) {
             test = new IndTestChiSquare(data, alpha);
         }

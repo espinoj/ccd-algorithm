@@ -19,8 +19,9 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.pitt.dbmi.ccd.algorithm.data.IndependenceTest;
+import edu.cmu.tetrad.search.IndependenceTest;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
+import edu.pitt.dbmi.ccd.algorithm.data.TestOfIndependence;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
 
 /**
@@ -29,17 +30,17 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public class IndependenceTestFactory {
+public class TestOfIndependenceFactory {
 
-    private IndependenceTestFactory() {
+    private TestOfIndependenceFactory() {
     }
 
-    public static IndependenceTest<edu.cmu.tetrad.search.IndependenceTest> buildTetradIndTest(final Class tetradIndTest, final DataSet data, final Parameters parameters) {
-        return new IndependenceTest<edu.cmu.tetrad.search.IndependenceTest>() {
-            private final edu.cmu.tetrad.search.IndependenceTest test = TetradIndependenceTestFactory.buildIndependenceTest(tetradIndTest, data, parameters);
+    public static TestOfIndependence<IndependenceTest> buildTetradIndTest(final Class tetradIndTest, final DataSet data, final Parameters parameters) {
+        return new TestOfIndependence<IndependenceTest>() {
+            private final IndependenceTest test = TetradIndependenceTestFactory.buildIndependenceTest(tetradIndTest, data, parameters);
 
             @Override
-            public edu.cmu.tetrad.search.IndependenceTest getIndependenceTest() {
+            public IndependenceTest getIndependenceTest() {
                 return test;
             }
         };

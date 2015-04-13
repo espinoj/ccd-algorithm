@@ -10,4 +10,6 @@ public interface Dataset<T> {
 
     public T getDataSet();
 
+    public boolean isContinuous();
+
 }

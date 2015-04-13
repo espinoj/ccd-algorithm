@@ -25,9 +25,13 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
 import edu.pitt.dbmi.ccd.algorithm.util.InputArgs;
-import java.io.File;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 /**
  *
@@ -41,27 +45,24 @@ public class GesApp {
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
             + "--data <file> "
             + "--out <dir> "
-            + "[--delim <char>] "
             + "[--penalty-discount <double>] "
-            + "[--pattern-store <int>] "
-            + "[--verbose] "
-            + "[--faithful]";
+            + "[--exclude-zero-corr-edge] "
+            + "[--continuous]"
+            + "[--verbose]";
 
     private static final String DATA_FLAG = "--data";
-    private static final String OUT_FLAG = "--out";
-    private static final String DELIM_FLAG = "--delim";
-    private static final String VERBOSE_FLAG = "--verbose";
-    private static final String FAITHFUL_FLAG = "--faithful";
     private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
-    private static final String PATTERN_STORE_FLAG = "--pattern-store";
+    private static final String EXCLUDE_ZERO_CORR_EDGE_FLAG = "--exclude-zero-corr-edge";
+    private static final String CONTINUOUS_FLAG = "--continuous";
+    private static final String VERBOSE_FLAG = "--verbose";
+    private static final String OUT_FLAG = "--out";
 
     private static Path dataFile;
     private static Path dirOut;
-    private static char delim;
-    private static Boolean verbose;
-    private static Boolean faithful;
     private static Double penaltyDiscount;
-    private static Integer numPatternsToStore;
+    private static Boolean excludeZeroCorrelationEdges;
+    private static Boolean verbose;
+    private static boolean continuous;
 
     /**
      * @param args the command line arguments
@@ -72,13 +73,10 @@ public class GesApp {
             System.exit(-127);
         }
 
-        dataFile = null;
-        dirOut = null;
-        delim = '\t';
-        verbose = Boolean.FALSE;
-        faithful = Boolean.FALSE;
         penaltyDiscount = 2.0;
-        numPatternsToStore = 0;
+        excludeZeroCorrelationEdges = Boolean.FALSE;
+        continuous = false;
+        verbose = Boolean.FALSE;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
@@ -86,26 +84,23 @@ public class GesApp {
                     case DATA_FLAG:
                         dataFile = InputArgs.getPathFile(args[++i]);
                         break;
-                    case OUT_FLAG:
-                        dirOut = InputArgs.getPathDir(args[++i]);
+                    case PENALTY_DISCOUNT_FLAG:
+                        penaltyDiscount = new Double(args[++i]);
                         break;
-                    case DELIM_FLAG:
-                        delim = InputArgs.getCharacter(args[++i]);
+                    case EXCLUDE_ZERO_CORR_EDGE_FLAG:
+                        excludeZeroCorrelationEdges = Boolean.TRUE;
+                        break;
+                    case CONTINUOUS_FLAG:
+                        continuous = true;
                         break;
                     case VERBOSE_FLAG:
                         verbose = Boolean.TRUE;
                         break;
-                    case FAITHFUL_FLAG:
-                        faithful = Boolean.TRUE;
-                        break;
-                    case PENALTY_DISCOUNT_FLAG:
-                        penaltyDiscount = Double.parseDouble(args[++i]);
-                        break;
-                    case PATTERN_STORE_FLAG:
-                        numPatternsToStore = Integer.parseInt(args[++i]);
+                    case OUT_FLAG:
+                        dirOut = Paths.get(args[++i]);
                         break;
                     default:
-                        throw new IllegalArgumentException(String.format("Unknown flag: %s.\n", flag));
+                        throw new Exception(String.format("Unknown flag: %s.\n", flag));
                 }
             }
             if (dataFile == null) {
@@ -116,39 +111,51 @@ public class GesApp {
             }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
+            System.exit(-127);
+        }
+
+        // create output file
+        String fileName;
+        if (excludeZeroCorrelationEdges) {
+            fileName = String.format("pc-stable_%fpenaltydisc_excldzerocorr_%d.txt", penaltyDiscount, System.currentTimeMillis());
+        } else {
+            fileName = String.format("pc-stable_%fpenaltydisc_%d.txt", penaltyDiscount, System.currentTimeMillis());
+        }
+        Path fileOut = Paths.get(dirOut.toString(), fileName);
+        try {
+            if (!Files.exists(dirOut)) {
+                Files.createDirectory(dirOut);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace(System.err);
             System.exit(-128);
         }
 
-        System.out.println();
-        System.out.println("================================================================================");
-        System.out.printf("GES (%s)\n", new Date(System.currentTimeMillis()));
-        System.out.println("--------------------------------------------------------------------------------");
-        System.out.printf("Dataset: %s\n", dataFile.getFileName().toString());
-        System.out.printf("Out: %s\n", dirOut.getFileName().toString());
-        System.out.printf("Verbose: %s\n", verbose);
-        System.out.printf("Faithful: %s\n", faithful);
-        System.out.printf("Penalty Discount: %s\n", penaltyDiscount);
-        System.out.printf("Number of Patterns To Store: %s\n", numPatternsToStore);
-        System.out.printf("Delimiter: %s\n", delim);
-        System.out.println("================================================================================");
-        System.out.println();
+        try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(fileOut, StandardOpenOption.CREATE)))) {
+            printOutParameters(stream);
 
-        try {
+            // read in the dataset
             TetradDataSet dataset = new TetradDataSet();
-            dataset.readDataFile(dataFile.toFile(), delim);
+            dataset.readDataFile(dataFile, '\t', continuous);
 
-            Parameters p = ParameterFactory.buildGesParameters(penaltyDiscount, numPatternsToStore, faithful, verbose);
+            // build the parameters
+            Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, excludeZeroCorrelationEdges, verbose);
+
             Algorithm algorithm = new TetradAlgorithm();
-            algorithm.run(GesGes.class, null, dataset, p);
+            algorithm.setExecutionOutput(stream);
+            algorithm.run(GesGes.class, null, dataset, params);
 
-            String filename = String.format("ges_%s_%d.txt",
-                    dataFile.getFileName().toString(),
-                    System.currentTimeMillis());
-//            GraphIO.write(algorithm.getGraph(), false, new File(dirOut.toFile(), filename));
-            GraphIO.write(algorithm.getGraph(), p, GesGes.class, new File(dirOut.toFile(), filename));
+            GraphIO.write(algorithm.getGraph(), false, stream);
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }
+    }
+
+    private static void printOutParameters(PrintStream stream) {
+        stream.println("Graph Parameters:");
+        stream.println(String.format("penalty discount = %f", penaltyDiscount));
+        stream.println(String.format("exclude zero correlation edges = %s", excludeZeroCorrelationEdges));
+        stream.println();
     }
 
 }

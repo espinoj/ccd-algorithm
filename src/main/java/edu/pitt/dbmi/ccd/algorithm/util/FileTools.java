@@ -18,11 +18,11 @@
  */
 package edu.pitt.dbmi.ccd.algorithm.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 
 /**
  *
@@ -38,10 +38,10 @@ public class FileTools {
 
     private static final byte SPACE = ' ';
 
-    public static int countColumn(File file, byte delimiter) throws IOException {
+    public static int countColumn(Path file, byte delimiter) throws IOException {
         int count = 0;
 
-        try (FileChannel fc = new RandomAccessFile(file, "r").getChannel()) {
+        try (FileChannel fc = new RandomAccessFile(file.toFile(), "r").getChannel()) {
             MappedByteBuffer buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             while (buffer.hasRemaining()) {
                 byte currentChar = buffer.get();
@@ -57,10 +57,10 @@ public class FileTools {
         return count;
     }
 
-    public static int countLine(File file) throws IOException {
+    public static int countLine(Path file) throws IOException {
         int count = 0;
 
-        try (FileChannel fc = new RandomAccessFile(file, "r").getChannel()) {
+        try (FileChannel fc = new RandomAccessFile(file.toFile(), "r").getChannel()) {
             MappedByteBuffer buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             byte prevChar = -1;
             while (buffer.hasRemaining()) {

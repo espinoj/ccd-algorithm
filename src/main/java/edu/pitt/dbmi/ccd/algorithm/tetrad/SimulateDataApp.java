@@ -21,6 +21,7 @@ package edu.pitt.dbmi.ccd.algorithm.tetrad;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.DataSetFactory;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.DataSetIO;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -34,7 +35,7 @@ public class SimulateDataApp {
 
     private static final String USAGE = "java -cp ccd-algorithm.jar "
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.SimulateDataApp "
-            + "--case <int> --var <int> --edge <int> --out <file>";
+            + "--case <int> --var <int> --edge <int> --out <dir>";
 
     private static final String CASE_FLAG = "--case";
 
@@ -52,7 +53,7 @@ public class SimulateDataApp {
 
     private static int numOfEdges;
 
-    private static Path fileOut;
+    private static Path dirOut;
 
     /**
      * @param args the command line arguments
@@ -77,7 +78,7 @@ public class SimulateDataApp {
                         numOfEdges = Integer.parseInt(args[++i]);
                         break;
                     case OUT_FLAG:
-                        fileOut = Paths.get(args[++i]);
+                        dirOut = Paths.get(args[++i]);
                         break;
                     default:
                         throw new IllegalArgumentException(String.format("Unknown flag: %s.\n", flag));
@@ -88,9 +89,18 @@ public class SimulateDataApp {
             System.exit(-128);
         }
 
+        String fileName = String.format("sim_data_%dvars_%dcases_%dedges_%d.txt",
+                numOfVariables,
+                numOfCases,
+                numOfEdges,
+                System.currentTimeMillis());
         try {
+            if (!Files.exists(dirOut)) {
+                Files.createDirectory(dirOut);
+            }
+            Path fileOut = Paths.get(dirOut.toString(), fileName);
             DataSetIO.write(DataSetFactory.buildSemSimulateDataAcyclic(numOfVariables, (double) numOfEdges, numOfCases),
-                    '\t', fileOut.toFile());
+                    '\t', fileOut);
         } catch (IOException exception) {
             exception.printStackTrace(System.err);
         }

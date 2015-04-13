@@ -66,8 +66,7 @@ public class InputArgs {
                 throw new FileNotFoundException(String.format("'%s' is not a file.\n", file));
             }
         } else {
-            throw new FileNotFoundException(
-                    String.format("File '%s' does not exist.\n", file));
+            throw new FileNotFoundException(String.format("File '%s' does not exist.\n", file));
         }
 
         return path;
