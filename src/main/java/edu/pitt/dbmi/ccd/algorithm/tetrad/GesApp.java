@@ -117,9 +117,9 @@ public class GesApp {
         // create output file
         String fileName;
         if (excludeZeroCorrelationEdges) {
-            fileName = String.format("pc-stable_%fpenaltydisc_excldzerocorr_%d.txt", penaltyDiscount, System.currentTimeMillis());
+            fileName = String.format("ges_%1.2fpd_excld_%d.txt", penaltyDiscount, System.currentTimeMillis());
         } else {
-            fileName = String.format("pc-stable_%fpenaltydisc_%d.txt", penaltyDiscount, System.currentTimeMillis());
+            fileName = String.format("ges_%1.2fpd_%d.txt", penaltyDiscount, System.currentTimeMillis());
         }
         Path fileOut = Paths.get(dirOut.toString(), fileName);
         try {

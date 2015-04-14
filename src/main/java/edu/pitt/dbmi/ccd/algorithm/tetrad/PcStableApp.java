@@ -117,7 +117,7 @@ public class PcStableApp {
         }
 
         // create output file
-        String fileName = String.format("pc-stable_%falpha_%ddepth_%d.txt",
+        String fileName = String.format("pc-stable_%fa_%dd_%d.txt",
                 alpha, depth, System.currentTimeMillis());
         Path fileOut = Paths.get(dirOut.toString(), fileName);
         try {

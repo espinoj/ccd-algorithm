@@ -89,10 +89,9 @@ public class SimulateDataApp {
             System.exit(-128);
         }
 
-        String fileName = String.format("sim_data_%dvars_%dcases_%dedges_%d.txt",
+        String fileName = String.format("sim_data_%dvars_%dcases_%d.txt",
                 numOfVariables,
                 numOfCases,
-                numOfEdges,
                 System.currentTimeMillis());
         try {
             if (!Files.exists(dirOut)) {
