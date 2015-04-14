@@ -14,23 +14,39 @@ CCD Algorithm is a Java application that provides an API interface to run a coll
 * mtj-0.9.14.jar
 * xom-1.1.jar
 
-Put all the dependency jars along with ccd-algorithm-1.0-SNAPSHOT.jar in a lib folder
+Put all the dependency jars along with ccd-algorithm-1.0.jar in a lib folder
 
 #### Run as an Application
-java -cp lib/ccd-algorithm-1.0-SNAPSHOT.jar edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --data data.txt --alpha 0.0001 --depth 3 --out output/
+
+##### Create Simulated Dataset
+```java
+// create dataset with 20 variables, 100 cases, and 1 edge per node
+java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.SimulateDataApp --var 20 --case 100 --edge 1 --out output/
+```
+
+##### Run PC-Stable
+```java
+java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --data data.txt --continuous --alpha 0.0001 --depth 3 --verbose --out output/
+```
+
+##### Run GES
+```java
+java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp --data data.txt --continuous --penalty-discount 2.0 --exclude-zero-corr-edge --verbose --out output/
+```
 
 #### Use as an API
 
 ##### Input
 ```java
+boolean continuous = true;
 File dataFile = new File("data.txt");
 
 // read in tab-delimited dataset
 TetradDataSet dataset = new TetradDataSet();
-dataset.readDataFile(dataFile, '\t');
+dataset.readDataFile(dataFile, '\t', continuous);
 ```
 
-##### PC-Stable
+##### Run PC-Stable
 ```java
 double alpha = 0.0001;
 int depth = 3;
@@ -41,34 +57,37 @@ Parameters params = ParameterFactory.buildPcStableParameters(alpha, depth, verbo
 
 // run the PC-Stable algorithm
 Algorithm algorithm = new TetradAlgorithm();
-if (dataset.getDataSet().isContinuous()) {
+algorithm.setExecutionOutput(System.out);  // print verbose messages to standard out
+if (dataset.isContinuous()) {
     algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
 } else {
     algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, params);
 }
 ```
 
-##### GES
+##### Run GES
 ```java
 double penaltyDiscount = 2.0;
-int numPatternsToStore = 0;
-boolean faithful = true;
+boolean excludeZeroCorrelationEdges = true;
 boolean verbose = true;
 
 // create parameters for GES
-Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, numPatternsToStore, faithful, verbose);
+Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, excludeZeroCorrelationEdges, verbose);
 
 // run the GES algorithm
 Algorithm algorithm = new TetradAlgorithm();
+algorithm.setExecutionOutput(System.out);  // print verbose messages to standard out
 algorithm.run(GesGes.class, null, dataset, params);
 ```
 
-##### Output
+##### Output Graph
 ```java
-File outputFile = new File("graph_out.txt");
+Path outputFile = Paths.get("graph_out.txt");
+OutputStream out = Files.newOutputStream(outputFile, StandardOpenOption.CREATE);
+PrintStream stream = new PrintStream(new BufferedOutputStream(out));
 boolean writeAsXml = false;
 
 // write out graph
 Graph graph = algorithm.getGraph();
-GraphIO.write(graph, writeAsXml, outputFile);
+GraphIO.write(graph, writeAsXml, stream);
 ```
