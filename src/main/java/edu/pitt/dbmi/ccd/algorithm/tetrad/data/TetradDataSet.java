@@ -24,7 +24,8 @@ public class TetradDataSet implements Dataset<DataSet> {
         if (data == null) {
             throw new IllegalArgumentException("Dataset file is required.");
         }
-        this.dataSet = DataSetIO.read(data, continuous, delimiter);
+//        this.dataSet = DataSetIO.read(data, continuous, delimiter);
+        this.dataSet = DataSetIO.read(delimiter, data.toFile());
         this.continuous = continuous;
     }
 
