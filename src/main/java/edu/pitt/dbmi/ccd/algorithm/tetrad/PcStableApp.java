@@ -49,8 +49,9 @@ public class PcStableApp {
             + "--out <dir> "
             + "[--alpha <double>] "
             + "[--depth <int>] "
-            + "[--continuous]"
-            + "[--verbose]";
+            + "[--continuous] "
+            + "[--verbose] "
+            + "[--fileName]";
 
     private static final String DATA_FLAG = "--data";
     private static final String ALPHA_FLAG = "--alpha";
@@ -58,6 +59,7 @@ public class PcStableApp {
     private static final String CONTINUOUS_FLAG = "--continuous";
     private static final String VERBOSE_FLAG = "--verbose";
     private static final String OUT_FLAG = "--out";
+    private static final String FILE_NAME_FLAG = "--fileName";
 
     private static Path dataFile;
     private static Path dirOut;
@@ -65,6 +67,7 @@ public class PcStableApp {
     private static Integer depth;
     private static Boolean verbose;
     private static boolean continuous;
+    private static String fileName;
 
     /**
      * @param args the command line arguments
@@ -79,6 +82,7 @@ public class PcStableApp {
         depth = 3;
         continuous = false;
         verbose = Boolean.FALSE;
+        fileName = null;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
@@ -91,6 +95,9 @@ public class PcStableApp {
                         break;
                     case DEPTH_FLAG:
                         depth = new Integer(args[++i]);
+                        break;
+                    case FILE_NAME_FLAG:
+                        fileName = args[++i];
                         break;
                     case CONTINUOUS_FLAG:
                         continuous = true;
@@ -117,8 +124,9 @@ public class PcStableApp {
         }
 
         // create output file
-        String fileName = String.format("pc-stable_%fa_%dd_%d.txt",
-                alpha, depth, System.currentTimeMillis());
+        if (fileName == null) {
+            fileName = String.format("pc-stable_%fa_%dd_%d.txt", alpha, depth, System.currentTimeMillis());
+        }
         Path fileOut = Paths.get(dirOut.toString(), fileName);
         try {
             if (!Files.exists(dirOut)) {
@@ -132,6 +140,7 @@ public class PcStableApp {
         try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(fileOut, StandardOpenOption.CREATE)))) {
             // print out the parameters
             printOutParameters(stream);
+            stream.flush();
 
             // read in the dataset
             TetradDataSet dataset = new TetradDataSet();
@@ -148,7 +157,10 @@ public class PcStableApp {
             } else {
                 algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, params);
             }
+            stream.flush();
+
             GraphIO.write(algorithm.getGraph(), false, stream);
+            stream.flush();
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }

@@ -47,8 +47,9 @@ public class GesApp {
             + "--out <dir> "
             + "[--penalty-discount <double>] "
             + "[--exclude-zero-corr-edge] "
-            + "[--continuous]"
-            + "[--verbose]";
+            + "[--continuous] "
+            + "[--verbose] "
+            + "[--fileName]";
 
     private static final String DATA_FLAG = "--data";
     private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
@@ -56,6 +57,7 @@ public class GesApp {
     private static final String CONTINUOUS_FLAG = "--continuous";
     private static final String VERBOSE_FLAG = "--verbose";
     private static final String OUT_FLAG = "--out";
+    private static final String FILE_NAME_FLAG = "--fileName";
 
     private static Path dataFile;
     private static Path dirOut;
@@ -63,6 +65,7 @@ public class GesApp {
     private static Boolean excludeZeroCorrelationEdges;
     private static Boolean verbose;
     private static boolean continuous;
+    private static String fileName;
 
     /**
      * @param args the command line arguments
@@ -77,6 +80,7 @@ public class GesApp {
         excludeZeroCorrelationEdges = Boolean.FALSE;
         continuous = false;
         verbose = Boolean.FALSE;
+        fileName = null;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
@@ -86,6 +90,9 @@ public class GesApp {
                         break;
                     case PENALTY_DISCOUNT_FLAG:
                         penaltyDiscount = new Double(args[++i]);
+                        break;
+                    case FILE_NAME_FLAG:
+                        fileName = args[++i];
                         break;
                     case EXCLUDE_ZERO_CORR_EDGE_FLAG:
                         excludeZeroCorrelationEdges = Boolean.TRUE;
@@ -115,12 +122,14 @@ public class GesApp {
         }
 
         // create output file
-        String fileName;
-        if (excludeZeroCorrelationEdges) {
-            fileName = String.format("ges_%1.2fpd_excld_%d.txt", penaltyDiscount, System.currentTimeMillis());
-        } else {
-            fileName = String.format("ges_%1.2fpd_%d.txt", penaltyDiscount, System.currentTimeMillis());
+        if (fileName == null) {
+            if (excludeZeroCorrelationEdges) {
+                fileName = String.format("ges_%1.2fpd_excld_%d.txt", penaltyDiscount, System.currentTimeMillis());
+            } else {
+                fileName = String.format("ges_%1.2fpd_%d.txt", penaltyDiscount, System.currentTimeMillis());
+            }
         }
+
         Path fileOut = Paths.get(dirOut.toString(), fileName);
         try {
             if (!Files.exists(dirOut)) {
@@ -133,6 +142,7 @@ public class GesApp {
 
         try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(fileOut, StandardOpenOption.CREATE)))) {
             printOutParameters(stream);
+            stream.flush();
 
             // read in the dataset
             TetradDataSet dataset = new TetradDataSet();
@@ -144,8 +154,10 @@ public class GesApp {
             Algorithm algorithm = new TetradAlgorithm();
             algorithm.setExecutionOutput(stream);
             algorithm.run(GesGes.class, null, dataset, params);
+            stream.flush();
 
             GraphIO.write(algorithm.getGraph(), false, stream);
+            stream.flush();
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }
