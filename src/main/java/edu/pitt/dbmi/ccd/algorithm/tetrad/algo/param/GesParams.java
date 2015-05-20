@@ -36,4 +36,6 @@ public interface GesParams extends TetradParams {
      */
     public static String PENALTY_DISCOUNT = "penaltyDiscount";
 
+    public static String DEPTH = "depth";
+
 }

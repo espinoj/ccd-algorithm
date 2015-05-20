@@ -18,7 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
-import edu.cmu.tetrad.search.GesGes;
+import edu.cmu.tetrad.search.FastGes;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
@@ -26,7 +26,6 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
 import edu.pitt.dbmi.ccd.algorithm.util.InputArgs;
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,27 +44,27 @@ public class GesApp {
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
             + "--data <file> "
             + "--out <dir> "
+            + "[--delim <char>] "
             + "[--penalty-discount <double>] "
-            + "[--exclude-zero-corr-edge] "
-            + "[--continuous] "
+            + "[--depth <int>] "
             + "[--verbose] "
-            + "[--fileName]";
+            + "[--out-filename <string>]";
 
     private static final String DATA_FLAG = "--data";
-    private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
-    private static final String EXCLUDE_ZERO_CORR_EDGE_FLAG = "--exclude-zero-corr-edge";
-    private static final String CONTINUOUS_FLAG = "--continuous";
-    private static final String VERBOSE_FLAG = "--verbose";
     private static final String OUT_FLAG = "--out";
-    private static final String FILE_NAME_FLAG = "--fileName";
+    private static final String DELIM_FLAG = "--delim";
+    private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
+    private static final String DEPTH_FLAG = "--depth";
+    private static final String VERBOSE_FLAG = "--verbose";
+    private static final String OUT_FILENAME_FLAG = "--out-filename";
 
     private static Path dataFile;
     private static Path dirOut;
+    private static char delim;
     private static Double penaltyDiscount;
-    private static Boolean excludeZeroCorrelationEdges;
+    private static Integer depth;
     private static Boolean verbose;
-    private static boolean continuous;
-    private static String fileName;
+    private static String outFilename;
 
     /**
      * @param args the command line arguments
@@ -76,11 +75,13 @@ public class GesApp {
             System.exit(-127);
         }
 
+        dataFile = null;
+        dirOut = null;
+        delim = '\t';
         penaltyDiscount = 2.0;
-        excludeZeroCorrelationEdges = Boolean.FALSE;
-        continuous = false;
+        depth = 3;
         verbose = Boolean.FALSE;
-        fileName = null;
+        outFilename = null;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
@@ -88,23 +89,22 @@ public class GesApp {
                     case DATA_FLAG:
                         dataFile = InputArgs.getPathFile(args[++i]);
                         break;
+                    case OUT_FLAG:
+                        dirOut = Paths.get(args[++i]);
+                        break;
+                    case DELIM_FLAG:
+                        delim = InputArgs.getCharacter(args[++i]);
+                        break;
                     case PENALTY_DISCOUNT_FLAG:
                         penaltyDiscount = new Double(args[++i]);
                         break;
-                    case FILE_NAME_FLAG:
-                        fileName = args[++i];
-                        break;
-                    case EXCLUDE_ZERO_CORR_EDGE_FLAG:
-                        excludeZeroCorrelationEdges = Boolean.TRUE;
-                        break;
-                    case CONTINUOUS_FLAG:
-                        continuous = true;
+                    case DEPTH_FLAG:
                         break;
                     case VERBOSE_FLAG:
                         verbose = Boolean.TRUE;
                         break;
-                    case OUT_FLAG:
-                        dirOut = Paths.get(args[++i]);
+                    case OUT_FILENAME_FLAG:
+                        outFilename = args[++i];
                         break;
                     default:
                         throw new Exception(String.format("Unknown flag: %s.\n", flag));
@@ -122,38 +122,25 @@ public class GesApp {
         }
 
         // create output file
-        if (fileName == null) {
-            if (excludeZeroCorrelationEdges) {
-                fileName = String.format("ges_%1.2fpd_excld_%d.txt", penaltyDiscount, System.currentTimeMillis());
-            } else {
-                fileName = String.format("ges_%1.2fpd_%d.txt", penaltyDiscount, System.currentTimeMillis());
-            }
+        if (outFilename == null) {
+            outFilename = String.format("ges_%1.2fp_%dd_%d.txt", penaltyDiscount, depth, System.currentTimeMillis());
         }
 
-        Path fileOut = Paths.get(dirOut.toString(), fileName);
-        try {
-            if (!Files.exists(dirOut)) {
-                Files.createDirectory(dirOut);
-            }
-        } catch (IOException exception) {
-            exception.printStackTrace(System.err);
-            System.exit(-128);
-        }
-
+        Path fileOut = Paths.get(dirOut.toString(), outFilename);
         try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(fileOut, StandardOpenOption.CREATE)))) {
             printOutParameters(stream);
             stream.flush();
 
             // read in the dataset
             TetradDataSet dataset = new TetradDataSet();
-            dataset.readDataFile(dataFile, '\t', continuous);
+            dataset.readDataFile(dataFile, delim, true);
 
             // build the parameters
-            Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, excludeZeroCorrelationEdges, verbose);
+            Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, depth, true, verbose);
 
             Algorithm algorithm = new TetradAlgorithm();
             algorithm.setExecutionOutput(stream);
-            algorithm.run(GesGes.class, null, dataset, params);
+            algorithm.run(FastGes.class, null, dataset, params);
             stream.flush();
 
             GraphIO.write(algorithm.getGraph(), false, stream);
@@ -166,7 +153,7 @@ public class GesApp {
     private static void printOutParameters(PrintStream stream) {
         stream.println("Graph Parameters:");
         stream.println(String.format("penalty discount = %f", penaltyDiscount));
-        stream.println(String.format("exclude zero correlation edges = %s", excludeZeroCorrelationEdges));
+        stream.println(String.format("depth = %s", depth));
         stream.println();
     }
 
