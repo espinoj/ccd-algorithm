@@ -10,7 +10,7 @@ CCD Algorithm is a Java application that provides an API interface to run a coll
 * commons-collections-3.1.jar
 * commons-math3-3.3.jar
 * jama-1.0.2.jar
-* lib-tetrad-5.1.0-11-SNAPSHOT.jar
+* lib-tetrad-0.3-SNAPSHOT.jar
 * mtj-0.9.14.jar
 * xom-1.1.jar
 
@@ -67,27 +67,29 @@ if (dataset.isContinuous()) {
 
 ##### Run GES
 ```java
-double penaltyDiscount = 2.0;
-boolean excludeZeroCorrelationEdges = true;
-boolean verbose = true;
+Double penaltyDiscount = 2.0;
+Integer depth = 3;
+Boolean faithful = Boolean.TRUE;
+Boolean verbose = Boolean.TRUE;
 
 // create parameters for GES
-Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, excludeZeroCorrelationEdges, verbose);
+Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, depth, faithful, verbose);
 
 // run the GES algorithm
 Algorithm algorithm = new TetradAlgorithm();
-algorithm.setExecutionOutput(System.out);  // print verbose messages to standard out
-algorithm.run(GesGes.class, null, dataset, params);
+algorithm.setExecutionOutput(System.out);  // write verbose messages to standard out
+algorithm.run(FastGes.class, null, dataset, params);
+
 ```
 
 ##### Output Graph
 ```java
-Path outputFile = Paths.get("graph_out.txt");
+Path outputFile = Paths.get("ges_graph.txt");
 OutputStream out = Files.newOutputStream(outputFile, StandardOpenOption.CREATE);
-PrintStream stream = new PrintStream(new BufferedOutputStream(out));
+PrintStream outputWriter = new PrintStream(new BufferedOutputStream(out));
 boolean writeAsXml = false;
 
 // write out graph
 Graph graph = algorithm.getGraph();
-GraphIO.write(graph, writeAsXml, stream);
+GraphIO.write(graph, writeAsXml, outputWriter);
 ```
