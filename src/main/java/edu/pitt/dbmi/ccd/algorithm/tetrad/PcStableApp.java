@@ -159,7 +159,7 @@ public class PcStableApp {
             }
             stream.flush();
 
-            GraphIO.write(algorithm.getGraph(), false, stream);
+            GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream);
             stream.flush();
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
