@@ -31,7 +31,7 @@ java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --
 
 ##### Run GES
 ```java
-java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp --data data.txt --continuous --penalty-discount 2.0 --exclude-zero-corr-edge --verbose --out output/
+java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp --data data.csv --delim $',' --penalty-discount 2.0 --depth 3 --verbose --out output/
 ```
 
 #### Use as an API

@@ -99,6 +99,7 @@ public class GesApp {
                         penaltyDiscount = new Double(args[++i]);
                         break;
                     case DEPTH_FLAG:
+                        depth = new Integer(args[++i]);
                         break;
                     case VERBOSE_FLAG:
                         verbose = Boolean.TRUE;
