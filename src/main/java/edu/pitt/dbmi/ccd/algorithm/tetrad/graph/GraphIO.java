@@ -24,7 +24,7 @@ public class GraphIO {
 		TETRAD, XML, GRAPHML
 	}
 
-	public static void write(final Graph graph, final GraphOutputType graphOutputType, final PrintStream stream)
+	public static void write(final Graph graph, final GraphOutputType graphOutputType, final PrintStream stream, final String graphId)
 			throws IOException {
 
 		switch (graphOutputType) {
@@ -35,7 +35,7 @@ public class GraphIO {
 			stream.println(graph.toString().trim());
 			return;
 		case GRAPHML:
-            stream.println(GraphmlSerializer.serialize(graph));
+            stream.println(GraphmlSerializer.serialize(graph, graphId));
 			return;
 
 		default:

@@ -25,6 +25,7 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
 import edu.pitt.dbmi.ccd.algorithm.util.InputArgs;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -41,157 +42,157 @@ import java.nio.file.StandardOpenOption;
  */
 public class GesApp {
 
-    private static final String USAGE = "java -jar fastges-cli.jar "
-            + "--data <file> "
-            + "--out <dir> "
-            + "[--penalty-discount <double>] "
-            + "[--exclude-zero-corr-edge] "
-            + "[--continuous] "
-            + "[--verbose] "
-            + "[--baseFileName] "
-            + "[--graphml]";
+	private static final String USAGE = "java -jar fastges-cli.jar " + "--data <file> " + "--out <dir> "
+			+ "[--penalty-discount <double>] " + "[--exclude-zero-corr-edge] " + "[--continuous] " + "[--verbose] "
+			+ "[--base-filename] " + "[--graphml]";
 
-    private static final String DATA_FLAG = "--data";
-    private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
-    private static final String EXCLUDE_ZERO_CORR_EDGE_FLAG = "--exclude-zero-corr-edge";
-    private static final String CONTINUOUS_FLAG = "--continuous";
-    private static final String VERBOSE_FLAG = "--verbose";
-    private static final String OUT_FLAG = "--out";
-    private static final String FILE_NAME_FLAG = "--baseFileName";
-    private static final String GRAPHML_FLAG = "--graphml";
+	// only switches that are boolean are called flags
+	private static final String DATA_PARAM = "--data";
+	private static final String PENALTY_DISCOUNT_PARAM = "--penalty-discount";
+	private static final String EXCLUDE_ZERO_CORR_EDGE_FLAG = "--exclude-zero-corr-edge";
+	private static final String CONTINUOUS_FLAG = "--continuous";
+	private static final String VERBOSE_FLAG = "--verbose";
+	private static final String OUT_PARAM = "--out";
+	private static final String BASE_FILE_NAME_PARAM = "--base-filename";
+	private static final String GRAPHML_FLAG = "--graphml";
 
-    private static Path dataFile;
-    private static Path dirOut;
-    private static Double penaltyDiscount;
-    private static Boolean excludeZeroCorrelationEdges;
-    private static Boolean verbose;
-    private static boolean continuous;
-    private static String baseFileName;
-    private static Boolean isOutputGraphml;
+	private static Path dataFile;
+	private static Path dirOut;
+	private static Double penaltyDiscount;
+	private static Boolean excludeZeroCorrelationEdges;
+	private static Boolean verbose;
+	private static Boolean continuous;
+	private static String baseFileName;
+	private static Boolean isOutputGraphml;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        if (args == null || args.length == 0) {
-            System.err.println(USAGE);
-            System.exit(-127);
-        }
+	/**
+	 * @param args
+	 *            the command line arguments
+	 */
+	public static void main(String[] args) {
 
-        penaltyDiscount = 2.0;
-        excludeZeroCorrelationEdges = Boolean.FALSE;
-        continuous = false;
-        verbose = Boolean.FALSE;
-        baseFileName = null;
-        isOutputGraphml = Boolean.FALSE;
-        try {
-            for (int i = 0; i < args.length; i++) {
-                String flag = args[i];
-                switch (flag) {
-                    case DATA_FLAG:
-                        dataFile = InputArgs.getPathFile(args[++i]);
-                        break;
-                    case PENALTY_DISCOUNT_FLAG:
-                        penaltyDiscount = new Double(args[++i]);
-                        break;
-                    case FILE_NAME_FLAG:
-                        baseFileName = args[++i];
-                        break;
-                    case EXCLUDE_ZERO_CORR_EDGE_FLAG:
-                        excludeZeroCorrelationEdges = Boolean.TRUE;
-                        break;
-                    case CONTINUOUS_FLAG:
-                        continuous = true;
-                        break;
-                    case VERBOSE_FLAG:
-                        verbose = Boolean.TRUE;
-                        break;
-                    case OUT_FLAG:
-                        dirOut = Paths.get(args[++i]);
-                        break;
-                    case GRAPHML_FLAG:
-                        isOutputGraphml = Boolean.TRUE;
-                        break;
-                    default:
-                        throw new Exception(String.format("Unknown flag: %s.\n", flag));
-                }
-            }
-            if (dataFile == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_FLAG));
-            }
-            if (dirOut == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", OUT_FLAG));
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace(System.err);
-            System.exit(-127);
-        }
+		if (args == null || args.length == 0) {
+			System.err.println(USAGE);
+			System.exit(-127);
+		}
 
-        // create output file
-        if (baseFileName == null) {
-            if (excludeZeroCorrelationEdges) {
-                baseFileName = String.format("ges_%1.2fpd_excld_%d", penaltyDiscount, System.currentTimeMillis());
-            } else {
-                baseFileName = String.format("ges_%1.2fpd_%d", penaltyDiscount, System.currentTimeMillis());
-            }
-        }
+		// defaults
+		penaltyDiscount = 2.0;
+		excludeZeroCorrelationEdges = Boolean.FALSE;
+		continuous = false;
+		verbose = Boolean.FALSE;
+		baseFileName = null;
+		isOutputGraphml = Boolean.FALSE;
 
-        // setup output file paths
-        Path txtFileOut = Paths.get(dirOut.toString(), baseFileName + ".txt");
-        Path graphmlFileOut = Paths.get(dirOut.toString(), baseFileName + ".graphml");
+		try {
+			for (int i = 0; i < args.length; i++) {
+				String flag = args[i];
+				switch (flag) {
+				case DATA_PARAM:
+					dataFile = InputArgs.getPathFile(args[++i]);
+					break;
+				case PENALTY_DISCOUNT_PARAM:
+					penaltyDiscount = new Double(args[++i]);
+					break;
+				case BASE_FILE_NAME_PARAM:
+					baseFileName = args[++i];
+					break;
+				case EXCLUDE_ZERO_CORR_EDGE_FLAG:
+					excludeZeroCorrelationEdges = true;
+					break;
+				case CONTINUOUS_FLAG:
+					continuous = true;
+					break;
+				case VERBOSE_FLAG:
+					verbose = true;
+					break;
+				case OUT_PARAM:
+					dirOut = Paths.get(args[++i]);
+					break;
+				case GRAPHML_FLAG:
+					isOutputGraphml = true;
+					break;
+				default:
+					throw new Exception(String.format("Unknown flag: %s.\n", flag));
+				}
+			}
+			if (dataFile == null) {
+				throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_PARAM));
+			}
+			if (dirOut == null) {
+				throw new IllegalArgumentException(String.format("Switch %s is required.", OUT_PARAM));
+			}
+		} catch (Exception exception) {
+			exception.printStackTrace(System.err);
+			System.exit(-127);
+		}
 
-        // create output directory if it doesn't exist
-        try {
-            if (!Files.exists(dirOut)) {
-                Files.createDirectory(dirOut);
-            }
-        } catch (IOException exception) {
-            exception.printStackTrace(System.err);
-            System.exit(-128);
-        }
+		// create output file
+		if (baseFileName == null) {
+			if (excludeZeroCorrelationEdges) {
+				baseFileName = String.format("ges_%1.2fpd_excld_%d", penaltyDiscount, System.currentTimeMillis());
+			} else {
+				baseFileName = String.format("ges_%1.2fpd_%d", penaltyDiscount, System.currentTimeMillis());
+			}
+		}
 
-        // run ges and output
-        try {
-            PrintStream txtOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(txtFileOut, StandardOpenOption.CREATE)));
-            printOutParameters(txtOutStream);
-            txtOutStream.flush();
+		// setup output file paths
+		Path txtFileOut = Paths.get(dirOut.toString(), baseFileName + ".txt");
+		Path graphmlFileOut = Paths.get(dirOut.toString(), baseFileName + ".graphml");
 
-            // read in the dataset
-            TetradDataSet dataset = new TetradDataSet();
-            dataset.readDataFile(dataFile, '\t', continuous);
+		// create output directory if it doesn't exist
+		try {
+			if (!Files.exists(dirOut)) {
+				Files.createDirectory(dirOut);
+			}
+		} catch (IOException exception) {
+			exception.printStackTrace(System.err);
+			System.exit(-128);
+		}
 
-            // build the parameters
-            Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, excludeZeroCorrelationEdges, verbose);
+		// run ges and output
+		try {
+			PrintStream txtOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(txtFileOut,
+					StandardOpenOption.CREATE)));
+			printOutParameters(txtOutStream);
+			txtOutStream.flush();
 
-            // run GES
-            Algorithm algorithm = new TetradAlgorithm();
-            algorithm.setExecutionOutput(txtOutStream);
-            algorithm.run(GesGes.class, null, dataset, params);
-            txtOutStream.flush();
+			// read in the dataset
+			TetradDataSet dataset = new TetradDataSet();
+			dataset.readDataFile(dataFile, '\t', continuous);
 
-            // output the graph to file
-            GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, txtOutStream);
-            txtOutStream.flush();
+			// build the parameters
+			Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, excludeZeroCorrelationEdges,
+					verbose);
 
-            // optionally also output graphml file
-            if (isOutputGraphml) {
-                PrintStream graphmlOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(graphmlFileOut, StandardOpenOption.CREATE)));
-                GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, graphmlOutStream);
-                graphmlOutStream.flush();
-            }
+			// run GES
+			Algorithm algorithm = new TetradAlgorithm();
+			algorithm.setExecutionOutput(txtOutStream);
+			algorithm.run(GesGes.class, null, dataset, params);
+			txtOutStream.flush();
 
+			// output the graph to file
+			GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, txtOutStream, baseFileName);
+			txtOutStream.flush();
 
+			// optionally output graphml file
+			if (isOutputGraphml) {
+				PrintStream graphmlOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(
+						graphmlFileOut, StandardOpenOption.CREATE)));
+				GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.GRAPHML, graphmlOutStream, baseFileName);
+				graphmlOutStream.flush();
+			}
 
-        } catch (Exception exception) {
-            exception.printStackTrace(System.err);
-        }
-    }
+		} catch (Exception exception) {
+			exception.printStackTrace(System.err);
+		}
+	}
 
-    private static void printOutParameters(PrintStream stream) {
-        stream.println("Graph Parameters:");
-        stream.println(String.format("penalty discount = %f", penaltyDiscount));
-        stream.println(String.format("exclude zero correlation edges = %s", excludeZeroCorrelationEdges));
-        stream.println();
-    }
+	private static void printOutParameters(PrintStream stream) {
+		stream.println("Graph Parameters:");
+		stream.println(String.format("penalty discount = %f", penaltyDiscount));
+		stream.println(String.format("exclude zero correlation edges = %s", excludeZeroCorrelationEdges));
+		stream.println();
+	}
 
 }

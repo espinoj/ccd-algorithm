@@ -1,79 +1,114 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad.graph;
 
 import edu.cmu.tetrad.graph.*;
+import org.graphdrawing.graphml.xmlns.*;
+import org.graphdrawing.graphml.xmlns.NodeType;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Author : Jeremy Espino MD
- * Created  5/26/15 11:02 PM
+ * Author : Jeremy Espino MD Created 5/26/15 11:02 PM
  */
 public class GraphmlSerializer {
 
+	private static final Logger LOGGER = Logger.getLogger(GraphmlSerializer.class.getSimpleName());
 
-    public static String serialize(Graph graph) {
+	public static String serialize(Graph graph, String graphId) {
 
-        List<Node> nodes = graph.getNodes();
-        Set<Edge> edgesSet = graph.getEdges();
-        Set<Triple> ambiguousTriples = graph.getAmbiguousTriples();
-        Set<Triple> underLineTriples = graph.getUnderLines();
-        Set<Triple> dottedUnderLineTriples = graph.getDottedUnderlines();
+		List<Node> nodes = graph.getNodes();
+		Set<Edge> edgesSet = graph.getEdges();
+		Set<Triple> ambiguousTriples = graph.getAmbiguousTriples();
+		Set<Triple> underLineTriples = graph.getUnderLines();
+		Set<Triple> dottedUnderLineTriples = graph.getDottedUnderlines();
+
+		try {
 
 
-            StringBuilder buf = new StringBuilder();
+		    GraphmlType graphmlType = new GraphmlType();
 
-            buf.append("\nGraph Nodes:\n");
+			GraphType graphType = new GraphType();
+			graphType.setId(graphId);
 
+			graphType.setEdgedefault(GraphEdgedefaultType.DIRECTED);
+
+            List<Object> nodesOrEdges = graphType.getDataOrNodeOrEdge();
             for (int i = 0; i < nodes.size(); i++) {
-    //            buf.append("\n" + (i + 1) + ". " + nodes.get(i));
-                buf.append(nodes.get(i) + " ");
-                if ((i + 1) % 30 == 0) buf.append("\n");
-            }
+				// buf.append("\n" + (i + 1) + ". " + nodes.get(i));
+				NodeType node = new NodeType();
+				node.setId(nodes.get(i).getName());
+				nodesOrEdges.add(node);
+			}
 
-            buf.append("\n\nGraph Edges: ");
-
-            List<Edge> edges = new ArrayList<Edge>(edgesSet);
-            Edges.sortEdges(edges);
-
+			List<Edge> edges = new ArrayList<Edge>(edgesSet);
+			Edges.sortEdges(edges);
             for (int i = 0; i < edges.size(); i++) {
-                Edge edge = edges.get(i);
-                buf.append("\n").append(i + 1).append(". ").append(edge);
-            }
+				Edge edge = edges.get(i);
+				EdgeType edgeType = new EdgeType();
+				if (edge.getEndpoint1() == Endpoint.TAIL && edge.getEndpoint2() == Endpoint.ARROW) {
+					edgeType.setSource(edge.getNode1().getName());
+					edgeType.setTarget(edge.getNode2().getName());
+                    edgeType.setDirected(true);
+				} else if (edge.getEndpoint1() == Endpoint.ARROW && edge.getEndpoint2() == Endpoint.TAIL) {
+					edgeType.setSource(edge.getNode2().getName());
+					edgeType.setTarget(edge.getNode1().getName());
+                    edgeType.setDirected(true);
+				} else if (edge.getEndpoint1() == Endpoint.TAIL && edge.getEndpoint2() == Endpoint.TAIL) {
+					edgeType.setSource(edge.getNode2().getName());
+					edgeType.setTarget(edge.getNode1().getName());
+					edgeType.setDirected(false);
+				} else {
+					// cannot handle all edges yet
+					LOGGER.log(Level.WARNING, "Encountered edge we currently don't handle when serializing graphml:"
+							+ edge.toString());
+					edgeType = null;
+				}
+				if (edgeType != null)
+					nodesOrEdges.add(edgeType);
+			}
 
-            buf.append("\n");
-            buf.append("\n");
+			graphmlType.getGraphOrData().add(graphType);
 
-    //        Set<Triple> ambiguousTriples = getAmbiguousTriples();
+			// TODO: handle ambiguousTriples
+			// TODO: handle underLineTriples
+			// TODO: handle dottedUnderLineTriples
 
-            if (!ambiguousTriples.isEmpty()) {
-                buf.append("Ambiguous triples (i.e. list of triples for which there is ambiguous data" +
-                        "\nabout whether they are colliders or not): \n");
+            // Context is the name of package
+			String context = "org.graphdrawing.graphml.xmlns";
+			// Initialise JAXB Context
+			JAXBContext jc = JAXBContext.newInstance(context);
 
-                for (Triple triple : ambiguousTriples) {
-                    buf.append(triple).append("\n");
-                }
-            }
+			// Always use factory methods to initialise XML classes
+			ObjectFactory factory = new ObjectFactory();
+            JAXBElement<GraphmlType> root = factory.createGraphml(graphmlType);
 
-            if (!underLineTriples.isEmpty()) {
-                buf.append("Underline triples: \n");
 
-                for (Triple triple : underLineTriples) {
-                    buf.append(triple).append("\n");
-                }
-            }
+			// Now Create JAXB XML Marshallar
+			Marshaller m = jc.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-            if (!dottedUnderLineTriples.isEmpty()) {
-                buf.append("Dotted underline triples: \n");
+			// Write the XML File
+			java.io.StringWriter sw = new StringWriter();
 
-                for (Triple triple : dottedUnderLineTriples) {
-                    buf.append(triple).append("\n");
-                }
-            }
+			Marshaller marshaller = jc.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			marshaller.marshal(root, sw);
 
-            return buf.toString();
-        }
+			return sw.toString();
 
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, e.getMessage());
+            e.printStackTrace();
+
+		}
+
+		return null;
+	}
 }
