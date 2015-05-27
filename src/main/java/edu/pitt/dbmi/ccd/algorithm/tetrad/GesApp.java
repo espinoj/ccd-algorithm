@@ -41,15 +41,15 @@ import java.nio.file.StandardOpenOption;
  */
 public class GesApp {
 
-    private static final String USAGE = "java -cp ccd-algorithm.jar "
-            + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
+    private static final String USAGE = "java -jar fastges-cli.jar "
             + "--data <file> "
             + "--out <dir> "
             + "[--penalty-discount <double>] "
             + "[--exclude-zero-corr-edge] "
             + "[--continuous] "
             + "[--verbose] "
-            + "[--fileName]";
+            + "[--baseFileName] "
+            + "[--graphml]";
 
     private static final String DATA_FLAG = "--data";
     private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
@@ -57,7 +57,8 @@ public class GesApp {
     private static final String CONTINUOUS_FLAG = "--continuous";
     private static final String VERBOSE_FLAG = "--verbose";
     private static final String OUT_FLAG = "--out";
-    private static final String FILE_NAME_FLAG = "--fileName";
+    private static final String FILE_NAME_FLAG = "--baseFileName";
+    private static final String GRAPHML_FLAG = "--graphml";
 
     private static Path dataFile;
     private static Path dirOut;
@@ -65,7 +66,8 @@ public class GesApp {
     private static Boolean excludeZeroCorrelationEdges;
     private static Boolean verbose;
     private static boolean continuous;
-    private static String fileName;
+    private static String baseFileName;
+    private static Boolean isOutputGraphml;
 
     /**
      * @param args the command line arguments
@@ -80,7 +82,8 @@ public class GesApp {
         excludeZeroCorrelationEdges = Boolean.FALSE;
         continuous = false;
         verbose = Boolean.FALSE;
-        fileName = null;
+        baseFileName = null;
+        isOutputGraphml = Boolean.FALSE;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
@@ -92,7 +95,7 @@ public class GesApp {
                         penaltyDiscount = new Double(args[++i]);
                         break;
                     case FILE_NAME_FLAG:
-                        fileName = args[++i];
+                        baseFileName = args[++i];
                         break;
                     case EXCLUDE_ZERO_CORR_EDGE_FLAG:
                         excludeZeroCorrelationEdges = Boolean.TRUE;
@@ -105,6 +108,9 @@ public class GesApp {
                         break;
                     case OUT_FLAG:
                         dirOut = Paths.get(args[++i]);
+                        break;
+                    case GRAPHML_FLAG:
+                        isOutputGraphml = Boolean.TRUE;
                         break;
                     default:
                         throw new Exception(String.format("Unknown flag: %s.\n", flag));
@@ -122,15 +128,19 @@ public class GesApp {
         }
 
         // create output file
-        if (fileName == null) {
+        if (baseFileName == null) {
             if (excludeZeroCorrelationEdges) {
-                fileName = String.format("ges_%1.2fpd_excld_%d.txt", penaltyDiscount, System.currentTimeMillis());
+                baseFileName = String.format("ges_%1.2fpd_excld_%d", penaltyDiscount, System.currentTimeMillis());
             } else {
-                fileName = String.format("ges_%1.2fpd_%d.txt", penaltyDiscount, System.currentTimeMillis());
+                baseFileName = String.format("ges_%1.2fpd_%d", penaltyDiscount, System.currentTimeMillis());
             }
         }
 
-        Path fileOut = Paths.get(dirOut.toString(), fileName);
+        // setup output file paths
+        Path txtFileOut = Paths.get(dirOut.toString(), baseFileName + ".txt");
+        Path graphmlFileOut = Paths.get(dirOut.toString(), baseFileName + ".graphml");
+
+        // create output directory if it doesn't exist
         try {
             if (!Files.exists(dirOut)) {
                 Files.createDirectory(dirOut);
@@ -140,9 +150,11 @@ public class GesApp {
             System.exit(-128);
         }
 
-        try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(fileOut, StandardOpenOption.CREATE)))) {
-            printOutParameters(stream);
-            stream.flush();
+        // run ges and output
+        try {
+            PrintStream txtOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(txtFileOut, StandardOpenOption.CREATE)));
+            printOutParameters(txtOutStream);
+            txtOutStream.flush();
 
             // read in the dataset
             TetradDataSet dataset = new TetradDataSet();
@@ -151,13 +163,25 @@ public class GesApp {
             // build the parameters
             Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, excludeZeroCorrelationEdges, verbose);
 
+            // run GES
             Algorithm algorithm = new TetradAlgorithm();
-            algorithm.setExecutionOutput(stream);
+            algorithm.setExecutionOutput(txtOutStream);
             algorithm.run(GesGes.class, null, dataset, params);
-            stream.flush();
+            txtOutStream.flush();
 
-            GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream);
-            stream.flush();
+            // output the graph to file
+            GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, txtOutStream);
+            txtOutStream.flush();
+
+            // optionally also output graphml file
+            if (isOutputGraphml) {
+                PrintStream graphmlOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(graphmlFileOut, StandardOpenOption.CREATE)));
+                GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, graphmlOutStream);
+                graphmlOutStream.flush();
+            }
+
+
+
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
         }

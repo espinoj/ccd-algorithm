@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.pitt.dbmi</groupId>
     <artifactId>ccd-algorithm</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,6 +35,14 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -52,7 +60,7 @@
                 <configuration>
                     <!-- required to override vendor standard-->
                     <extension>true</extension>
-                    <schemaFiles>xgmml.xsd</schemaFiles>
+                    <schemaFiles>graphml.xsd</schemaFiles>
                     <!--<outputDirectory>${basedir}/src/main/java</outputDirectory>-->
                 </configuration>
             </plugin>

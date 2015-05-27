@@ -21,7 +21,7 @@ import java.nio.file.Path;
 public class GraphIO {
 
 	public enum GraphOutputType {
-		TETRAD, XML, XGMML
+		TETRAD, XML, GRAPHML
 	}
 
 	public static void write(final Graph graph, final GraphOutputType graphOutputType, final PrintStream stream)
@@ -34,7 +34,8 @@ public class GraphIO {
 		case TETRAD:
 			stream.println(graph.toString().trim());
 			return;
-		case XGMML:
+		case GRAPHML:
+            stream.println(GraphmlSerializer.serialize(graph));
 			return;
 
 		default:
@@ -56,7 +57,7 @@ public class GraphIO {
                 case TETRAD:
                     writer.write(graph.toString());
                     return;
-                case XGMML:
+                case GRAPHML:
                     return;
                 default:
                     // print some warning
@@ -65,6 +66,8 @@ public class GraphIO {
             }
         }
     }
+
+
 
 	public static Graph read(final File file, final boolean xml) throws IOException {
 		return xml ? GraphUtils.loadGraph(file) : GraphUtils.loadGraphTxt(file);
