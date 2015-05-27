@@ -44,7 +44,7 @@ public class GesApp {
 
 	private static final String USAGE = "java -jar fastges-cli.jar " + "--data <file> " + "--out <dir> "
 			+ "[--penalty-discount <double>] " + "[--exclude-zero-corr-edge] " + "[--continuous] " + "[--verbose] "
-			+ "[--base-filename] " + "[--graphml]";
+			+ "[--base-filename] " + "[--graphml] " + "[--delimiter <char>]";
 
 	// only switches that are boolean are called flags
 	private static final String DATA_PARAM = "--data";
@@ -55,6 +55,7 @@ public class GesApp {
 	private static final String OUT_PARAM = "--out";
 	private static final String BASE_FILE_NAME_PARAM = "--base-filename";
 	private static final String GRAPHML_FLAG = "--graphml";
+    private static final String DELIMITER_PARAM = "--delimiter";
 
 	private static Path dataFile;
 	private static Path dirOut;
@@ -64,6 +65,7 @@ public class GesApp {
 	private static Boolean continuous;
 	private static String baseFileName;
 	private static Boolean isOutputGraphml;
+    private static char delimiter;
 
 	/**
 	 * @param args
@@ -83,6 +85,7 @@ public class GesApp {
 		verbose = Boolean.FALSE;
 		baseFileName = null;
 		isOutputGraphml = Boolean.FALSE;
+        delimiter = '\t';
 
 		try {
 			for (int i = 0; i < args.length; i++) {
@@ -112,6 +115,9 @@ public class GesApp {
 				case GRAPHML_FLAG:
 					isOutputGraphml = true;
 					break;
+                case DELIMITER_PARAM:
+                    delimiter = args[++i].charAt(0);
+                    break;
 				default:
 					throw new Exception(String.format("Unknown flag: %s.\n", flag));
 				}
@@ -159,7 +165,7 @@ public class GesApp {
 
 			// read in the dataset
 			TetradDataSet dataset = new TetradDataSet();
-			dataset.readDataFile(dataFile, '\t', continuous);
+			dataset.readDataFile(dataFile, delimiter, continuous);
 
 			// build the parameters
 			Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, excludeZeroCorrelationEdges,
