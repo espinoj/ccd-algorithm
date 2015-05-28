@@ -1,0 +1,57 @@
+.\" Process this file with
+.\" groff -man -Tascii fastges-cli.man
+.TH fastges-cli 1 "5/28/2015"
+.SH NAME
+fastges-cli - Run greedy equivalence search procedure
+.SH SYNOPSIS
+java -jar fastges-cli.jar 
+--data <file> --out <dir> [--penalty-discount <double>] [--exclude-zero-corr-edge] [--continuous] [--verbose] [--base-filename <string>] [--graphml] [--delimiter <char>] [--depth <int>]
+.SH DESCRIPTION
+FASTGES is a optimized version of greedy equivalence search (GES) by
+Chickering 2002.  FASTGES improves on previous implementations by ...
+
+fastges-cli will execute the greedy equivalence search procedure
+on a delimited file and output a causal graph.  The input file uses 
+tab delimiters by default and must contain column header line labeling
+each variable.
+.SS Options
+.TP
+--data
+the input datafile
+.TP
+--out
+the directory where the program will write the results
+.TP
+--penalty-discount
+penalty discount
+.TP
+--exclude-zero-corr-edge
+exclude zero correlation edges
+.TP
+--continuous
+interpret the data as continuous variables
+.TP
+--verbose
+enable verbose output
+.TP
+--base-filename
+the base filename for the output i.e., will append .txt, .graphml to the base to create filenames
+.TP
+--graphml
+output a graphml formatted file
+.TP
+--delimiter
+the delimiter that defines each column
+.TP
+--depth
+the search depth
+.SH EXAMPLES
+.TP
+Execute fastges on data.csv file which utilizes comma delimiters and output to the output directory using a penalty discount of 2.0 and search depth of 3
+
+java -jar fastges-cli.jar --data data.csv --delim $',' --penalty-discount 2.0 --depth 3 --verbose --out output/
+
+.SH FILES
+.TP
+fastges-cli.jar
+
