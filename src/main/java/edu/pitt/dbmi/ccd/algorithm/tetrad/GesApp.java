@@ -24,7 +24,7 @@ import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
-import edu.pitt.dbmi.ccd.algorithm.util.InputArgs;
+import edu.pitt.dbmi.ccd.algorithm.util.ArgsUtil;
 import java.io.BufferedOutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -87,13 +87,13 @@ public class GesApp {
                 String flag = args[i];
                 switch (flag) {
                     case DATA_FLAG:
-                        dataFile = InputArgs.getPathFile(args[++i]);
+                        dataFile = ArgsUtil.getPathFile(args[++i]);
                         break;
                     case OUT_FLAG:
                         dirOut = Paths.get(args[++i]);
                         break;
                     case DELIM_FLAG:
-                        delim = InputArgs.getCharacter(args[++i]);
+                        delim = ArgsUtil.getCharacter(args[++i]);
                         break;
                     case PENALTY_DISCOUNT_FLAG:
                         penaltyDiscount = new Double(args[++i]);

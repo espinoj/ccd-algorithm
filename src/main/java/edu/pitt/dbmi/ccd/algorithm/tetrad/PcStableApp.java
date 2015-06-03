@@ -26,7 +26,7 @@ import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
-import edu.pitt.dbmi.ccd.algorithm.util.InputArgs;
+import edu.pitt.dbmi.ccd.algorithm.util.ArgsUtil;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -88,7 +88,7 @@ public class PcStableApp {
                 String flag = args[i];
                 switch (flag) {
                     case DATA_FLAG:
-                        dataFile = InputArgs.getPathFile(args[++i]);
+                        dataFile = ArgsUtil.getPathFile(args[++i]);
                         break;
                     case ALPHA_FLAG:
                         alpha = new Double(args[++i]);

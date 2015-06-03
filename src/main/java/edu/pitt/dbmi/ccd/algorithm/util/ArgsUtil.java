@@ -30,9 +30,9 @@ import java.nio.file.Paths;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public class InputArgs {
+public class ArgsUtil {
 
-    private InputArgs() {
+    private ArgsUtil() {
     }
 
     public static char getCharacter(String character) {
