@@ -41,10 +41,10 @@ import java.nio.file.StandardOpenOption;
  */
 public class GesApp {
 
-    private static final String USAGE = "java -cp ccd-algorithm.jar "
+    private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
             + "--data <file> "
-            + "--out <dir> "
+            + "[--out <dir>] "
             + "[--delimiter <char>] "
             + "[--penalty-discount <double>] "
             + "[--depth <int>] "
@@ -64,6 +64,15 @@ public class GesApp {
     private static final String VERBOSE_FLAG = "--verbose";
 
     private static final String OUT_FILENAME_PARAM = "--out-filename";
+
+    private static final String HELP_INFO = "================================================================================\n"
+            + String.format("%-18s\t%s\n", DATA_PARAM, "The input data file.")
+            + String.format("%-18s\t%s\n", OUT_PARAM, "Directory where results will be written to.  Current working directory is the default.")
+            + String.format("%-18s\t%s\n", DELIM_PARAM, "A single character used to separate data in a line.  A tab character is the default.")
+            + String.format("%-18s\t%s\n", PENALTY_DISCOUNT_PARAM, "Penality discount.  The default value is 2.0.")
+            + String.format("%-18s\t%s\n", DEPTH_PARAM, "The search depth.  The default value is 3.")
+            + String.format("%-18s\t%s\n", VERBOSE_FLAG, "Output additional information from the algorithm.  No additional information by default.")
+            + String.format("%-18s\t%s\n", OUT_FILENAME_PARAM, "The base name of the output files.  The algorithm's name with an integer timestamp is the default.");
 
     private static Path dataFile;
 
@@ -85,11 +94,12 @@ public class GesApp {
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
             System.err.println(USAGE);
+            System.err.println(HELP_INFO);
             System.exit(-127);
         }
 
         dataFile = null;
-        dirOut = null;
+        dirOut = Paths.get(".");
         delimiter = '\t';
         penaltyDiscount = 2.0;
         depth = 3;
@@ -126,9 +136,6 @@ public class GesApp {
             }
             if (dataFile == null) {
                 throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_PARAM));
-            }
-            if (dirOut == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", OUT_PARAM));
             }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
