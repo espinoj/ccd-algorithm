@@ -88,16 +88,16 @@ public class PcStableApp {
                 String flag = args[i];
                 switch (flag) {
                     case DATA_FLAG:
-                        dataFile = ArgsUtil.getPathFile(args[++i]);
+                        dataFile = ArgsUtil.getPathFile(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case ALPHA_FLAG:
-                        alpha = new Double(args[++i]);
+                        alpha = new Double(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case DEPTH_FLAG:
-                        depth = new Integer(args[++i]);
+                        depth = new Integer(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case FILE_NAME_FLAG:
-                        fileName = args[++i];
+                        fileName = ArgsUtil.getParam(args, ++i, flag);
                         break;
                     case CONTINUOUS_FLAG:
                         continuous = true;
@@ -106,7 +106,7 @@ public class PcStableApp {
                         verbose = Boolean.TRUE;
                         break;
                     case OUT_FLAG:
-                        dirOut = Paths.get(args[++i]);
+                        dirOut = Paths.get(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     default:
                         throw new Exception(String.format("Unknown flag: %s.\n", flag));

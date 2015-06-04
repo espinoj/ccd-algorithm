@@ -35,6 +35,14 @@ public class ArgsUtil {
     private ArgsUtil() {
     }
 
+    public static String getParam(String[] args, int index, String flag) {
+        if (index >= args.length || args[index] == null || args[index].length() == 0) {
+            throw new IllegalArgumentException(
+                    String.format("A value is required for switch %s.", flag));
+        }
+        return args[index];
+    }
+
     public static char getCharacter(String character) {
         if (character.length() == 1) {
             return character.charAt(0);

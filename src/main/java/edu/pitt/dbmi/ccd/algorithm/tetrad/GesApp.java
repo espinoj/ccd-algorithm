@@ -87,25 +87,25 @@ public class GesApp {
                 String flag = args[i];
                 switch (flag) {
                     case DATA_FLAG:
-                        dataFile = ArgsUtil.getPathFile(args[++i]);
+                        dataFile = ArgsUtil.getPathFile(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case OUT_FLAG:
-                        dirOut = Paths.get(args[++i]);
+                        dirOut = Paths.get(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case DELIM_FLAG:
-                        delim = ArgsUtil.getCharacter(args[++i]);
+                        delim = ArgsUtil.getCharacter(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case PENALTY_DISCOUNT_FLAG:
-                        penaltyDiscount = new Double(args[++i]);
+                        penaltyDiscount = new Double(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case DEPTH_FLAG:
-                        depth = new Integer(args[++i]);
+                        depth = new Integer(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case VERBOSE_FLAG:
                         verbose = Boolean.TRUE;
                         break;
                     case OUT_FILENAME_FLAG:
-                        outFilename = args[++i];
+                        outFilename = ArgsUtil.getParam(args, ++i, flag);
                         break;
                     default:
                         throw new Exception(String.format("Unknown flag: %s.\n", flag));
@@ -124,7 +124,7 @@ public class GesApp {
 
         // create output file
         if (outFilename == null) {
-            outFilename = String.format("ges_%1.2fp_%dd_%d.txt", penaltyDiscount, depth, System.currentTimeMillis());
+            outFilename = String.format("ges_%d.txt", System.currentTimeMillis());
         }
 
         Path fileOut = Paths.get(dirOut.toString(), outFilename);
