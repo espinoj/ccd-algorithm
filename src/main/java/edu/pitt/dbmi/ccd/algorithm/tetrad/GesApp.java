@@ -44,26 +44,38 @@ public class GesApp {
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
             + "--data <file> "
             + "--out <dir> "
-            + "[--delim <char>] "
+            + "[--delimiter <char>] "
             + "[--penalty-discount <double>] "
             + "[--depth <int>] "
             + "[--verbose] "
             + "[--out-filename <string>]";
 
-    private static final String DATA_FLAG = "--data";
-    private static final String OUT_FLAG = "--out";
-    private static final String DELIM_FLAG = "--delim";
-    private static final String PENALTY_DISCOUNT_FLAG = "--penalty-discount";
-    private static final String DEPTH_FLAG = "--depth";
+    private static final String DATA_PARAM = "--data";
+
+    private static final String OUT_PARAM = "--out";
+
+    private static final String DELIM_PARAM = "--delimiter";
+
+    private static final String PENALTY_DISCOUNT_PARAM = "--penalty-discount";
+
+    private static final String DEPTH_PARAM = "--depth";
+
     private static final String VERBOSE_FLAG = "--verbose";
-    private static final String OUT_FILENAME_FLAG = "--out-filename";
+
+    private static final String OUT_FILENAME_PARAM = "--out-filename";
 
     private static Path dataFile;
+
     private static Path dirOut;
-    private static char delim;
+
+    private static char delimiter;
+
     private static Double penaltyDiscount;
+
     private static Integer depth;
+
     private static Boolean verbose;
+
     private static String outFilename;
 
     /**
@@ -77,7 +89,7 @@ public class GesApp {
 
         dataFile = null;
         dirOut = null;
-        delim = '\t';
+        delimiter = '\t';
         penaltyDiscount = 2.0;
         depth = 3;
         verbose = Boolean.FALSE;
@@ -86,25 +98,25 @@ public class GesApp {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
                 switch (flag) {
-                    case DATA_FLAG:
+                    case DATA_PARAM:
                         dataFile = ArgsUtil.getPathFile(ArgsUtil.getParam(args, ++i, flag));
                         break;
-                    case OUT_FLAG:
+                    case OUT_PARAM:
                         dirOut = Paths.get(ArgsUtil.getParam(args, ++i, flag));
                         break;
-                    case DELIM_FLAG:
-                        delim = ArgsUtil.getCharacter(ArgsUtil.getParam(args, ++i, flag));
+                    case DELIM_PARAM:
+                        delimiter = ArgsUtil.getCharacter(ArgsUtil.getParam(args, ++i, flag));
                         break;
-                    case PENALTY_DISCOUNT_FLAG:
+                    case PENALTY_DISCOUNT_PARAM:
                         penaltyDiscount = new Double(ArgsUtil.getParam(args, ++i, flag));
                         break;
-                    case DEPTH_FLAG:
+                    case DEPTH_PARAM:
                         depth = new Integer(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case VERBOSE_FLAG:
                         verbose = Boolean.TRUE;
                         break;
-                    case OUT_FILENAME_FLAG:
+                    case OUT_FILENAME_PARAM:
                         outFilename = ArgsUtil.getParam(args, ++i, flag);
                         break;
                     default:
@@ -112,10 +124,10 @@ public class GesApp {
                 }
             }
             if (dataFile == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_FLAG));
+                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_PARAM));
             }
             if (dirOut == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", OUT_FLAG));
+                throw new IllegalArgumentException(String.format("Switch %s is required.", OUT_PARAM));
             }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
@@ -134,7 +146,7 @@ public class GesApp {
 
             // read in the dataset
             TetradDataSet dataset = new TetradDataSet();
-            dataset.readDataFile(dataFile, delim, true);
+            dataset.readDataFile(dataFile, delimiter, true);
 
             // build the parameters
             Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, depth, true, verbose);
