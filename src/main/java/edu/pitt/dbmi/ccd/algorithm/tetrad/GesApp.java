@@ -26,6 +26,7 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
 import edu.pitt.dbmi.ccd.algorithm.util.ArgsUtil;
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -76,7 +77,7 @@ public class GesApp {
 
     private static Boolean verbose;
 
-    private static String outFilename;
+    private static String outputFileName;
 
     /**
      * @param args the command line arguments
@@ -93,7 +94,7 @@ public class GesApp {
         penaltyDiscount = 2.0;
         depth = 3;
         verbose = Boolean.FALSE;
-        outFilename = null;
+        outputFileName = null;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
@@ -102,7 +103,7 @@ public class GesApp {
                         dataFile = ArgsUtil.getPathFile(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case OUT_PARAM:
-                        dirOut = Paths.get(ArgsUtil.getParam(args, ++i, flag));
+                        dirOut = ArgsUtil.getPathDir(ArgsUtil.getParam(args, ++i, flag), false);
                         break;
                     case DELIM_PARAM:
                         delimiter = ArgsUtil.getCharacter(ArgsUtil.getParam(args, ++i, flag));
@@ -117,10 +118,10 @@ public class GesApp {
                         verbose = Boolean.TRUE;
                         break;
                     case OUT_FILENAME_PARAM:
-                        outFilename = ArgsUtil.getParam(args, ++i, flag);
+                        outputFileName = ArgsUtil.getParam(args, ++i, flag);
                         break;
                     default:
-                        throw new Exception(String.format("Unknown flag: %s.\n", flag));
+                        throw new Exception(String.format("Unknown switch: %s.\n", flag));
                 }
             }
             if (dataFile == null) {
@@ -134,13 +135,22 @@ public class GesApp {
             System.exit(-127);
         }
 
-        // create output file
-        if (outFilename == null) {
-            outFilename = String.format("ges_%d.txt", System.currentTimeMillis());
+        try {
+            if (Files.notExists(dirOut)) {
+                Files.createDirectory(dirOut);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace(System.err);
+            System.exit(-128);
         }
 
-        Path fileOut = Paths.get(dirOut.toString(), outFilename);
-        try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(fileOut, StandardOpenOption.CREATE)))) {
+        // create output file
+        if (outputFileName == null) {
+            outputFileName = String.format("ges_%d.txt", System.currentTimeMillis());
+        }
+
+        Path outputFile = Paths.get(dirOut.toString(), outputFileName);
+        try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(outputFile, StandardOpenOption.CREATE)))) {
             printOutParameters(stream);
             stream.flush();
 

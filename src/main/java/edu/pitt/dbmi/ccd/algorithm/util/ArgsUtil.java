@@ -51,7 +51,7 @@ public class ArgsUtil {
         }
     }
 
-    public static Path getPathDir(String dir) throws FileNotFoundException {
+    public static Path getPathDir(String dir, boolean required) throws FileNotFoundException {
         Path path = Paths.get(dir);
 
         if (Files.exists(path)) {
@@ -59,8 +59,9 @@ public class ArgsUtil {
                 throw new FileNotFoundException(String.format("'%s' is not a directory.\n", dir));
             }
         } else {
-            throw new FileNotFoundException(
-                    String.format("Directory '%s' does not exist.\n", dir));
+            if (required) {
+                throw new FileNotFoundException(String.format("Directory '%s' does not exist.\n", dir));
+            }
         }
 
         return path;
