@@ -92,7 +92,7 @@ public class PcStableApp {
         dataFile = null;
         dirOut = null;
         delimiter = '\t';
-        alpha = 0.0001;
+        alpha = 0.001;
         depth = 3;
         verbose = Boolean.FALSE;
         outputFileName = null;
@@ -148,6 +148,8 @@ public class PcStableApp {
         // create output file
         if (outputFileName == null) {
             outputFileName = String.format("pc-stable_%d.txt", System.currentTimeMillis());
+        } else {
+            outputFileName = outputFileName + ".txt";
         }
 
         Path outputFile = Paths.get(dirOut.toString(), outputFileName);

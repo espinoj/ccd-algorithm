@@ -147,6 +147,8 @@ public class GesApp {
         // create output file
         if (outputFileName == null) {
             outputFileName = String.format("ges_%d.txt", System.currentTimeMillis());
+        } else {
+            outputFileName = outputFileName + ".txt";
         }
 
         Path outputFile = Paths.get(dirOut.toString(), outputFileName);
