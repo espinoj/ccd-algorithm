@@ -16,9 +16,9 @@ CCD Algorithm is a Java application that provides an API interface to run a coll
 * jama-1.0.2.jar
 * mtj-0.9.14.jar
 * xom-1.1.jar
-* lib-tetrad-0.3-SNAPSHOT.jar
+* lib-tetrad-0.3.jar
 
-All the dependecies above are public except for lib-tetrad-0.3-SNAPSHOT.jar.  Download the zip file <a href="https://github.com/bd2kccd/lib-tetrad/archive/lib-tetrad-0.3-kvb2.zip">lib-tetrad-lib-tetrad-0.3-kvb2.zip</a> and do a maven install.  After lib-tetrad-0.3-SNAPSHOT is installed, do a maven package on ccd-algorithm-ccd-algorithm-graphml-0.3-kvb2.  It should produce fastges-cli.jar.
+All the dependecies above are public except for lib-tetrad-0.3.jar.  Download the zip file <a href="https://github.com/bd2kccd/lib-tetrad/archive/v0.3.zip">lib-tetrad-0.3.zip</a> and do a maven install.  After lib-tetrad-0.3 is installed, do a maven package.  It should produce fastges-cli.jar.
 #### Run as an Application
 
 ##### Usage
