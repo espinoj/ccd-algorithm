@@ -1,95 +1,29 @@
-## What is CCD Algorithm
+##CCD Algorithm: Fast GES
 
-CCD Algorithm is a Java application that provides an API interface to run a collection of algorithms that are found in Tetrad and others. 
+CCD Algorithm is a Java application that provides an API interface to run a collection of algorithms that are found in Tetrad and others.  This particular release is focused on FastGES, the latest version of GES that can handle large dataset and run efficiently.
 
 
 ## How can I use it?
+
+#### System Requirement
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java 8 SDK</a> and above to compile and run.
+<a href="https://maven.apache.org/download.cgi">Apache Maven 3.x</a> to compile.
 
 #### Required Dependencies
 * colt-1.2.0.jar
 * commons-collections-3.1.jar
 * commons-math3-3.3.jar
 * jama-1.0.2.jar
-* lib-tetrad-0.3-SNAPSHOT.jar
 * mtj-0.9.14.jar
 * xom-1.1.jar
+* lib-tetrad-0.3-SNAPSHOT.jar
 
-Put all the dependency jars along with ccd-algorithm-1.0.jar in a lib folder
-
+All the dependecies above are public except for lib-tetrad-0.3-SNAPSHOT.jar.  Download the zip file <a href="https://github.com/bd2kccd/lib-tetrad/archive/lib-tetrad-0.3-kvb2.zip">lib-tetrad-lib-tetrad-0.3-kvb2.zip</a> and do a maven install.  After lib-tetrad-0.3-SNAPSHOT is installed, do a maven package on ccd-algorithm-ccd-algorithm-graphml-0.3-kvb2.  It should produce fastges-cli.jar.
 #### Run as an Application
 
-##### Create Simulated Dataset
-```java
-// create dataset with 20 variables, 100 cases, and 1 edge per node
-java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.SimulateDataApp --var 20 --case 100 --edge 1 --out output/
-```
+##### Usage
+Show the usage and the list of options
+><pre>java -jar fastges-cli.jar</pre>
 
-##### Run PC-Stable
-```java
-java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp --data data.txt --continuous --alpha 0.0001 --depth 3 --verbose --out output/
-```
-
-##### Run GES
-```java
-java -cp lib/ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp --data data.csv --delim $',' --penalty-discount 2.0 --depth 3 --verbose --out output/
-```
-
-#### Use as an API
-
-##### Input
-```java
-boolean continuous = true;
-File dataFile = new File("data.txt");
-
-// read in tab-delimited dataset
-TetradDataSet dataset = new TetradDataSet();
-dataset.readDataFile(dataFile, '\t', continuous);
-```
-
-##### Run PC-Stable
-```java
-double alpha = 0.0001;
-int depth = 3;
-boolean verbose = true;
-
-// create parameters for PC-Stable
-Parameters params = ParameterFactory.buildPcStableParameters(alpha, depth, verbose);
-
-// run the PC-Stable algorithm
-Algorithm algorithm = new TetradAlgorithm();
-algorithm.setExecutionOutput(System.out);  // print verbose messages to standard out
-if (dataset.isContinuous()) {
-    algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
-} else {
-    algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, params);
-}
-```
-
-##### Run GES
-```java
-Double penaltyDiscount = 2.0;
-Integer depth = 3;
-Boolean faithful = Boolean.TRUE;
-Boolean verbose = Boolean.TRUE;
-
-// create parameters for GES
-Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, depth, faithful, verbose);
-
-// run the GES algorithm
-Algorithm algorithm = new TetradAlgorithm();
-algorithm.setExecutionOutput(System.out);  // write verbose messages to standard out
-algorithm.run(FastGes.class, null, dataset, params);
-
-```
-
-##### Output Graph
-```java
-Path outputFile = Paths.get("ges_graph.txt");
-OutputStream out = Files.newOutputStream(outputFile, StandardOpenOption.CREATE);
-PrintStream outputWriter = new PrintStream(new BufferedOutputStream(out));
-boolean writeAsXml = false;
-
-// write out graph
-Graph graph = algorithm.getGraph();
-GraphIO.write(graph, writeAsXml, outputWriter);
-```
+##### Run Fast GES
+><pre>java -jar fastges-cli.jar --data test_data.txt</pre>
