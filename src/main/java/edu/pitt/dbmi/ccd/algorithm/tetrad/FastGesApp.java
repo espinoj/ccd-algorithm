@@ -42,7 +42,7 @@ import java.nio.file.StandardOpenOption;
 public class FastGesApp {
 
     private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
-            + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
+            + "edu.pitt.dbmi.ccd.algorithm.tetrad.FastGesApp "
             + "--data <file> "
             + "[--out <dir>] "
             + "[--delimiter <char>] "
