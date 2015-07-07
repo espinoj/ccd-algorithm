@@ -39,7 +39,7 @@ import java.nio.file.StandardOpenOption;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public class GesApp {
+public class FastGesApp {
 
     private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
