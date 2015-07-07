@@ -179,6 +179,7 @@ public class GesApp {
             stream.flush();
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
+            System.exit(-1);
         }
     }
 

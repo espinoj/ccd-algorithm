@@ -181,6 +181,7 @@ public class PcStableApp {
             stream.flush();
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
+            System.exit(-1);
         }
     }
 
