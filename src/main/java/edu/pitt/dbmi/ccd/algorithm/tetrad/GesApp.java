@@ -18,6 +18,7 @@
  */
 package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
+import edu.cmu.tetrad.search.FastGes;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
@@ -89,7 +90,7 @@ public class GesApp {
 
     private static Boolean verbose;
 
-    private static String outputFileName;
+    private static String baseOutputFileName;
     
     private static Boolean isOutputGraphml;
 
@@ -109,7 +110,7 @@ public class GesApp {
         penaltyDiscount = 2.0;
         depth = 3;
         verbose = Boolean.FALSE;
-        outputFileName = null;
+        baseOutputFileName = null;
         isOutputGraphml = Boolean.FALSE;
         try {
             for (int i = 0; i < args.length; i++) {
@@ -134,7 +135,7 @@ public class GesApp {
                         verbose = Boolean.TRUE;
                         break;
                     case OUT_FILENAME_PARAM:
-                        outputFileName = ArgsUtil.getParam(args, ++i, flag);
+                        baseOutputFileName = ArgsUtil.getParam(args, ++i, flag);
                         break;
                     case GRAPHML_FLAG:
                 		isOutputGraphml = true;
@@ -161,13 +162,12 @@ public class GesApp {
         }
 
         // create output file
-        if (outputFileName == null) {
-            outputFileName = String.format("ges_%d.txt", System.currentTimeMillis());
-        } else {
-            outputFileName = outputFileName + ".txt";
+        if (baseOutputFileName == null) {
+            baseOutputFileName = String.format("ges_%d", System.currentTimeMillis());
         }
+        String outputFileName = baseOutputFileName + ".txt";
 
-        Path outputFile = Paths.get(dirOut.toString(), outputFileName);
+        Path outputFile = Paths.get(dirOut.toString(), baseOutputFileName);
         try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(outputFile, StandardOpenOption.CREATE)))) {
             printOutParameters(stream);
             stream.flush();
@@ -184,14 +184,15 @@ public class GesApp {
             algorithm.run(FastGes.class, null, dataset, params);
             stream.flush();
 
-			GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, txtOutStream, baseFileName);
+			GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream, outputFileName);
             stream.flush();
             
             // optionally output graphml file
 			if (isOutputGraphml) {
+                Path graphOutputFile = Paths.get(dirOut.toString(), baseOutputFileName + ".graphml");
 				PrintStream graphmlOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(
-						graphmlFileOut, StandardOpenOption.CREATE)));
-				GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.GRAPHML, graphmlOutStream, baseFileName);
+                        graphOutputFile, StandardOpenOption.CREATE)));
+				GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.GRAPHML, graphmlOutStream, baseOutputFileName);
 				graphmlOutStream.flush();
 			}
         } catch (Exception exception) {

@@ -177,7 +177,7 @@ public class PcStableApp {
             algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
             stream.flush();
 
-            GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream);
+            GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream, outputFileName);
             stream.flush();
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
