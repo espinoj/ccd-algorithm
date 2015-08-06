@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.ccd.pitt.edu" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="algorithm">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element type="xs:string" name="name"/>
+        <xs:element type="xs:string" name="version"/>
+		<xs:element type="xs:string" name="algorithmClassPath" />
+        <xs:element type="xs:string" name="description"/>
+        <xs:element type="xs:dateTime" name="creationDateTime"/>
+        <xs:element type="xs:dateTime" name="lastUpdated"/>
+        <xs:element name="parameters">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="parameter" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name"/>
+                    <xs:element type="xs:string" name="displayedName"/>
+                    <xs:element type="xs:string" name="description" minOccurs="0" maxOccurs="1"/>
+                    <xs:element type="xs:string" name="dataType"/>
+                    <xs:element type="xs:anySimpleType" name="enumValue" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element type="xs:anySimpleType" name="defaultValue"/>
+                    <xs:element type="xs:anySimpleType" name="minValue" minOccurs="0" maxOccurs="1"/>
+                    <xs:element type="xs:anySimpleType" name="maxValue" minOccurs="0" maxOccurs="1"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" name="required" use="optional"/>
+                  <xs:attribute type="xs:boolean" name="hidden" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,9 +1,9 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad.algo;
 
-import edu.cmu.tetrad.data.CovarianceMatrix5;
+import edu.cmu.tetrad.data.CovarianceMatrixOnTheFly;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.search.GesGes;
+import edu.cmu.tetrad.search.FastGes;
 import edu.cmu.tetrad.search.IndependenceTest;
 import edu.cmu.tetrad.search.PcStable;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
@@ -69,22 +69,25 @@ public class TetradAlgorithm implements Algorithm {
             if (executionOutput != null) {
                 executionOutput.println();
             }
-        } else if (algorithm == GesGes.class) {
+        } else if (algorithm == FastGes.class) {
             // get parameters
             Double pd = (Double) parameters.getParameter(GesParams.PENALTY_DISCOUNT);
             double penaltyDiscount = (pd == null) ? 2.0 : pd;
+            Integer d = (Integer) parameters.getParameter(GesParams.DEPTH);
+            int depth = (d == null) ? 3 : d;
             Boolean f = (Boolean) parameters.getParameter(GesParams.FAITHFUL);
             boolean faithful = (f == null) ? false : f;
             Boolean v = (Boolean) parameters.getParameter(GesParams.VERBOSE);
             boolean verbose = (v == null) ? false : v;
 
-            GesGes ges;
+            FastGes ges;
             if (dataset.isContinuous()) {
-                ges = new GesGes(new CovarianceMatrix5(dataSet));
+                ges = new FastGes(new CovarianceMatrixOnTheFly(dataSet));
                 ges.setPenaltyDiscount(penaltyDiscount);
             } else {
-                ges = new GesGes(dataSet);
+                ges = new FastGes(dataSet);
             }
+            ges.setDepth(depth);
             ges.setNumPatternsToStore(0);  // always set to zero
             ges.setFaithfulnessAssumed(faithful);
             ges.setVerbose(verbose);

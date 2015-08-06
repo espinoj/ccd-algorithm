@@ -18,7 +18,6 @@
  */
 package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
-import edu.cmu.tetrad.search.IndTestChiSquare;
 import edu.cmu.tetrad.search.IndTestFisherZ;
 import edu.cmu.tetrad.search.PcStable;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
@@ -26,7 +25,7 @@ import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
-import edu.pitt.dbmi.ccd.algorithm.util.InputArgs;
+import edu.pitt.dbmi.ccd.algorithm.util.ArgsUtil;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -43,31 +42,52 @@ import java.nio.file.StandardOpenOption;
  */
 public class PcStableApp {
 
-    private static final String USAGE = "java -cp ccd-algorithm.jar "
+    private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.PcStableApp "
             + "--data <file> "
-            + "--out <dir> "
+            + "[--out <dir>] "
+            + "[--delimiter <char>] "
             + "[--alpha <double>] "
             + "[--depth <int>] "
-            + "[--continuous] "
             + "[--verbose] "
-            + "[--fileName]";
+            + "[--out-filename <string>]";
 
-    private static final String DATA_FLAG = "--data";
-    private static final String ALPHA_FLAG = "--alpha";
-    private static final String DEPTH_FLAG = "--depth";
-    private static final String CONTINUOUS_FLAG = "--continuous";
+    private static final String DATA_PARAM = "--data";
+
+    private static final String OUT_PARAM = "--out";
+
+    private static final String DELIM_PARAM = "--delimiter";
+
+    private static final String ALPHA_PARAM = "--alpha";
+
+    private static final String DEPTH_PARAM = "--depth";
+
     private static final String VERBOSE_FLAG = "--verbose";
-    private static final String OUT_FLAG = "--out";
-    private static final String FILE_NAME_FLAG = "--fileName";
+
+    private static final String OUT_FILENAME_PARAM = "--out-filename";
+
+    private static final String HELP_INFO = "================================================================================\n"
+            + String.format("%-18s\t%s\n", DATA_PARAM, "The input data file.")
+            + String.format("%-18s\t%s\n", OUT_PARAM, "Directory where results will be written to.  Current working directory is the default.")
+            + String.format("%-18s\t%s\n", DELIM_PARAM, "A single character used to separate data in a line.  A tab character is the default.")
+            + String.format("%-18s\t%s\n", ALPHA_PARAM, "The alpha value for the independence test.  The default value is 0.001.")
+            + String.format("%-18s\t%s\n", DEPTH_PARAM, "The search depth.  The default value is 3.")
+            + String.format("%-18s\t%s\n", VERBOSE_FLAG, "Output additional information from the algorithm.  No additional information by default.")
+            + String.format("%-18s\t%s\n", OUT_FILENAME_PARAM, "The base name of the output files.  The algorithm's name with an integer timestamp is the default.");
 
     private static Path dataFile;
+
     private static Path dirOut;
+
+    private static char delimiter;
+
     private static Double alpha;
+
     private static Integer depth;
+
     private static Boolean verbose;
-    private static boolean continuous;
-    private static String fileName;
+
+    private static String outputFileName;
 
     /**
      * @param args the command line arguments
@@ -75,61 +95,56 @@ public class PcStableApp {
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
             System.err.println(USAGE);
+            System.err.println(HELP_INFO);
             System.exit(-127);
         }
 
-        alpha = 0.0001;
+        dataFile = null;
+        dirOut = Paths.get(".");
+        delimiter = '\t';
+        alpha = 0.001;
         depth = 3;
-        continuous = false;
         verbose = Boolean.FALSE;
-        fileName = null;
+        outputFileName = null;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
                 switch (flag) {
-                    case DATA_FLAG:
-                        dataFile = InputArgs.getPathFile(args[++i]);
+                    case DATA_PARAM:
+                        dataFile = ArgsUtil.getPathFile(ArgsUtil.getParam(args, ++i, flag));
                         break;
-                    case ALPHA_FLAG:
-                        alpha = new Double(args[++i]);
+                    case OUT_PARAM:
+                        dirOut = ArgsUtil.getPathDir(ArgsUtil.getParam(args, ++i, flag), false);
                         break;
-                    case DEPTH_FLAG:
-                        depth = new Integer(args[++i]);
+                    case DELIM_PARAM:
+                        delimiter = ArgsUtil.getCharacter(ArgsUtil.getParam(args, ++i, flag));
                         break;
-                    case FILE_NAME_FLAG:
-                        fileName = args[++i];
+                    case ALPHA_PARAM:
+                        alpha = new Double(ArgsUtil.getParam(args, ++i, flag));
                         break;
-                    case CONTINUOUS_FLAG:
-                        continuous = true;
+                    case DEPTH_PARAM:
+                        depth = new Integer(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case VERBOSE_FLAG:
                         verbose = Boolean.TRUE;
                         break;
-                    case OUT_FLAG:
-                        dirOut = Paths.get(args[++i]);
+                    case OUT_FILENAME_PARAM:
+                        outputFileName = ArgsUtil.getParam(args, ++i, flag);
                         break;
                     default:
-                        throw new Exception(String.format("Unknown flag: %s.\n", flag));
+                        throw new Exception(String.format("Unknown switch: %s.\n", flag));
                 }
             }
             if (dataFile == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_FLAG));
-            }
-            if (dirOut == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", OUT_FLAG));
+                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_PARAM));
             }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
             System.exit(-127);
         }
 
-        // create output file
-        if (fileName == null) {
-            fileName = String.format("pc-stable_%fa_%dd_%d.txt", alpha, depth, System.currentTimeMillis());
-        }
-        Path fileOut = Paths.get(dirOut.toString(), fileName);
         try {
-            if (!Files.exists(dirOut)) {
+            if (Files.notExists(dirOut)) {
                 Files.createDirectory(dirOut);
             }
         } catch (IOException exception) {
@@ -137,14 +152,21 @@ public class PcStableApp {
             System.exit(-128);
         }
 
-        try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(fileOut, StandardOpenOption.CREATE)))) {
-            // print out the parameters
+        // create output file
+        if (outputFileName == null) {
+            outputFileName = String.format("pc-stable_%d.txt", System.currentTimeMillis());
+        } else {
+            outputFileName = outputFileName + ".txt";
+        }
+
+        Path outputFile = Paths.get(dirOut.toString(), outputFileName);
+        try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(outputFile, StandardOpenOption.CREATE)))) {
             printOutParameters(stream);
             stream.flush();
 
             // read in the dataset
             TetradDataSet dataset = new TetradDataSet();
-            dataset.readDataFile(dataFile, '\t', continuous);
+            dataset.readDataFile(dataFile, delimiter, true);
 
             // build the parameters
             Parameters params = ParameterFactory.buildPcStableParameters(alpha, depth, verbose);
@@ -152,11 +174,7 @@ public class PcStableApp {
             // run algorithm
             Algorithm algorithm = new TetradAlgorithm();
             algorithm.setExecutionOutput(stream);
-            if (continuous) {
-                algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
-            } else {
-                algorithm.run(PcStable.class, IndTestChiSquare.class, dataset, params);
-            }
+            algorithm.run(PcStable.class, IndTestFisherZ.class, dataset, params);
             stream.flush();
 
             GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream);

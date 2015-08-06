@@ -30,9 +30,17 @@ import java.nio.file.Paths;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public class InputArgs {
+public class ArgsUtil {
 
-    private InputArgs() {
+    private ArgsUtil() {
+    }
+
+    public static String getParam(String[] args, int index, String flag) {
+        if (index >= args.length || args[index] == null || args[index].length() == 0) {
+            throw new IllegalArgumentException(
+                    String.format("A value is required for switch %s.", flag));
+        }
+        return args[index];
     }
 
     public static char getCharacter(String character) {
@@ -43,7 +51,7 @@ public class InputArgs {
         }
     }
 
-    public static Path getPathDir(String dir) throws FileNotFoundException {
+    public static Path getPathDir(String dir, boolean required) throws FileNotFoundException {
         Path path = Paths.get(dir);
 
         if (Files.exists(path)) {
@@ -51,8 +59,9 @@ public class InputArgs {
                 throw new FileNotFoundException(String.format("'%s' is not a directory.\n", dir));
             }
         } else {
-            throw new FileNotFoundException(
-                    String.format("Directory '%s' does not exist.\n", dir));
+            if (required) {
+                throw new FileNotFoundException(String.format("Directory '%s' does not exist.\n", dir));
+            }
         }
 
         return path;
