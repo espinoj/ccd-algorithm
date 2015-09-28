@@ -4,6 +4,7 @@ import edu.cmu.tetrad.data.CovarianceMatrixOnTheFly;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.search.FastGes;
+import edu.cmu.tetrad.search.FastImages2;
 import edu.cmu.tetrad.search.IndependenceTest;
 import edu.cmu.tetrad.search.PcStable;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
@@ -15,6 +16,8 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *
@@ -96,6 +99,31 @@ public class TetradAlgorithm implements Algorithm {
             }
 
             graph = ges.search();
+            if (executionOutput != null) {
+                executionOutput.println();
+            }
+        } else if (algorithm == FastImages2.class) {    
+            // get parameters
+        	Double pd = (Double) parameters.getParameter(GesParams.PENALTY_DISCOUNT);
+        	double penaltyDiscount = (pd == null) ? 1.0 : pd;
+            Integer d = (Integer) parameters.getParameter(GesParams.DEPTH);
+            int depth = (d == null) ? 2 : d;
+            Boolean f = (Boolean) parameters.getParameter(GesParams.FAITHFUL);
+            boolean faithful = (f == null) ? false : f;
+            Boolean v = (Boolean) parameters.getParameter(GesParams.VERBOSE);
+            boolean verbose = (v == null) ? false : v;
+
+            FastImages2 imaGes = new FastImages2(new ArrayList<DataSet>(Collections.singleton(dataSet)), dataset.isContinuous());
+            imaGes.setPenaltyDiscount(penaltyDiscount);
+            imaGes.setDepth(depth);
+            imaGes.setNumPatternsToStore(0); // always set to zero
+            imaGes.setFaithfulnessAssumed(faithful);
+            imaGes.setVerbose(verbose);
+            if (executionOutput != null) {
+            	imaGes.setOut(executionOutput);
+            }
+            
+            graph = imaGes.search();
             if (executionOutput != null) {
                 executionOutput.println();
             }
