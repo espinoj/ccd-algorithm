@@ -25,7 +25,7 @@ public class GraphFactory {
             vars.add(new ContinuousVariable("X" + i));
         }
 
-        return GraphUtils.randomDagQuick2(vars, 0, (int) (numofVars * edgesPerNode));
+        return GraphUtils.randomDagQuick(vars, 0, (int) (numofVars * edgesPerNode));
     }
 
 }

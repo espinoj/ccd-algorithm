@@ -65,7 +65,7 @@ public class FastGesApp {
     private static final String VERBOSE_FLAG = "--verbose";
 
     private static final String OUT_FILENAME_PARAM = "--out-filename";
-    
+
     private static final String GRAPHML_FLAG = "--graphml";
 
     private static final String HELP_INFO = "================================================================================\n"
@@ -91,7 +91,7 @@ public class FastGesApp {
     private static Boolean verbose;
 
     private static String baseOutputFileName;
-    
+
     private static Boolean isOutputGraphml;
 
     /**
@@ -138,7 +138,7 @@ public class FastGesApp {
                         baseOutputFileName = ArgsUtil.getParam(args, ++i, flag);
                         break;
                     case GRAPHML_FLAG:
-                		isOutputGraphml = true;
+                        isOutputGraphml = true;
                         break;
                     default:
                         throw new Exception(String.format("Unknown switch: %s.\n", flag));
@@ -184,17 +184,17 @@ public class FastGesApp {
             algorithm.run(FastGes.class, null, dataset, params);
             stream.flush();
 
-			GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream, outputFileName);
+            GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream, outputFileName);
             stream.flush();
-            
+
             // optionally output graphml file
-			if (isOutputGraphml) {
+            if (isOutputGraphml) {
                 Path graphOutputFile = Paths.get(dirOut.toString(), baseOutputFileName + ".graphml");
-				PrintStream graphmlOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(
+                PrintStream graphmlOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(
                         graphOutputFile, StandardOpenOption.CREATE)));
-				GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.GRAPHML, graphmlOutStream, baseOutputFileName);
-				graphmlOutStream.flush();
-			}
+                GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.GRAPHML, graphmlOutStream, baseOutputFileName);
+                graphmlOutStream.flush();
+            }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
             System.exit(-1);
