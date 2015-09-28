@@ -39,16 +39,17 @@ import java.nio.file.StandardOpenOption;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public class GesApp {
+public class FastGesApp {
 
     private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
-            + "edu.pitt.dbmi.ccd.algorithm.tetrad.GesApp "
+            + "edu.pitt.dbmi.ccd.algorithm.tetrad.FastGesApp "
             + "--data <file> "
             + "[--out <dir>] "
             + "[--delimiter <char>] "
             + "[--penalty-discount <double>] "
             + "[--depth <int>] "
             + "[--verbose] "
+            + "[--graphml] "
             + "[--out-filename <string>]";
 
     private static final String DATA_PARAM = "--data";
@@ -64,6 +65,8 @@ public class GesApp {
     private static final String VERBOSE_FLAG = "--verbose";
 
     private static final String OUT_FILENAME_PARAM = "--out-filename";
+    
+    private static final String GRAPHML_FLAG = "--graphml";
 
     private static final String HELP_INFO = "================================================================================\n"
             + String.format("%-18s\t%s\n", DATA_PARAM, "The input data file.")
@@ -72,6 +75,7 @@ public class GesApp {
             + String.format("%-18s\t%s\n", PENALTY_DISCOUNT_PARAM, "Penality discount.  The default value is 2.0.")
             + String.format("%-18s\t%s\n", DEPTH_PARAM, "The search depth.  The default value is 3.")
             + String.format("%-18s\t%s\n", VERBOSE_FLAG, "Output additional information from the algorithm.  No additional information by default.")
+            + String.format("%-18s\t%s\n", GRAPHML_FLAG, "Output graphml formatted file.")
             + String.format("%-18s\t%s\n", OUT_FILENAME_PARAM, "The base name of the output files.  The algorithm's name with an integer timestamp is the default.");
 
     private static Path dataFile;
@@ -86,7 +90,9 @@ public class GesApp {
 
     private static Boolean verbose;
 
-    private static String outputFileName;
+    private static String baseOutputFileName;
+    
+    private static Boolean isOutputGraphml;
 
     /**
      * @param args the command line arguments
@@ -104,7 +110,8 @@ public class GesApp {
         penaltyDiscount = 2.0;
         depth = 3;
         verbose = Boolean.FALSE;
-        outputFileName = null;
+        baseOutputFileName = null;
+        isOutputGraphml = Boolean.FALSE;
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
@@ -128,7 +135,10 @@ public class GesApp {
                         verbose = Boolean.TRUE;
                         break;
                     case OUT_FILENAME_PARAM:
-                        outputFileName = ArgsUtil.getParam(args, ++i, flag);
+                        baseOutputFileName = ArgsUtil.getParam(args, ++i, flag);
+                        break;
+                    case GRAPHML_FLAG:
+                		isOutputGraphml = true;
                         break;
                     default:
                         throw new Exception(String.format("Unknown switch: %s.\n", flag));
@@ -152,13 +162,12 @@ public class GesApp {
         }
 
         // create output file
-        if (outputFileName == null) {
-            outputFileName = String.format("ges_%d.txt", System.currentTimeMillis());
-        } else {
-            outputFileName = outputFileName + ".txt";
+        if (baseOutputFileName == null) {
+            baseOutputFileName = String.format("ges_%d", System.currentTimeMillis());
         }
+        String outputFileName = baseOutputFileName + ".txt";
 
-        Path outputFile = Paths.get(dirOut.toString(), outputFileName);
+        Path outputFile = Paths.get(dirOut.toString(), baseOutputFileName);
         try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(outputFile, StandardOpenOption.CREATE)))) {
             printOutParameters(stream);
             stream.flush();
@@ -175,10 +184,20 @@ public class GesApp {
             algorithm.run(FastGes.class, null, dataset, params);
             stream.flush();
 
-            GraphIO.write(algorithm.getGraph(), false, stream);
+			GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.TETRAD, stream, outputFileName);
             stream.flush();
+            
+            // optionally output graphml file
+			if (isOutputGraphml) {
+                Path graphOutputFile = Paths.get(dirOut.toString(), baseOutputFileName + ".graphml");
+				PrintStream graphmlOutStream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(
+                        graphOutputFile, StandardOpenOption.CREATE)));
+				GraphIO.write(algorithm.getGraph(), GraphIO.GraphOutputType.GRAPHML, graphmlOutStream, baseOutputFileName);
+				graphmlOutStream.flush();
+			}
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
+            System.exit(-1);
         }
     }
 

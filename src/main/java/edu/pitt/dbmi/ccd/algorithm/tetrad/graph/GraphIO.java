@@ -2,6 +2,7 @@ package edu.pitt.dbmi.ccd.algorithm.tetrad.graph;
 
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.GraphUtils;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -19,27 +20,57 @@ import java.nio.file.Path;
  */
 public class GraphIO {
 
-    public static void write(final Graph graph, final boolean xml, final PrintStream stream) throws IOException {
-        if (xml) {
-            stream.println(GraphUtils.graphToXml(graph));
-        } else {
-            stream.println(graph.toString().trim());
-        }
-    }
+	public enum GraphOutputType {
+		TETRAD, XML, GRAPHML
+	}
 
-    public static void write(final Graph graph, final boolean xml, final File file) throws IOException {
+	public static void write(final Graph graph, final GraphOutputType graphOutputType, final PrintStream stream, final String graphId)
+			throws IOException {
+
+		switch (graphOutputType) {
+		case XML:
+			stream.println(GraphUtils.graphToXml(graph));
+			return;
+		case TETRAD:
+			stream.println(graph.toString().trim());
+			return;
+		case GRAPHML:
+            stream.println(GraphmlSerializer.serialize(graph, graphId));
+			return;
+
+		default:
+			// print some warning
+			stream.println(graph.toString().trim());
+			return;
+		}
+
+	}
+
+	public static void write(final Graph graph, final GraphOutputType graphOutputType, final File file) throws IOException {
         Path path = file.toPath();
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            if (xml) {
-                writer.write(GraphUtils.graphToXml(graph));
-            } else {
-                writer.write(graph.toString());
+
+            switch (graphOutputType) {
+                case XML:
+                    writer.write(GraphUtils.graphToXml(graph));
+                    return;
+                case TETRAD:
+                    writer.write(graph.toString());
+                    return;
+                case GRAPHML:
+                    return;
+                default:
+                    // print some warning
+                    writer.write(graph.toString());
+                    return;
             }
         }
     }
 
-    public static Graph read(final File file, final boolean xml) throws IOException {
-        return xml ? GraphUtils.loadGraph(file) : GraphUtils.loadGraphTxt(file);
-    }
+
+
+	public static Graph read(final File file, final boolean xml) throws IOException {
+		return xml ? GraphUtils.loadGraph(file) : GraphUtils.loadGraphTxt(file);
+	}
 
 }
