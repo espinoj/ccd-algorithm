@@ -167,7 +167,7 @@ public class FastGesApp {
         }
         String outputFileName = baseOutputFileName + ".txt";
 
-        Path outputFile = Paths.get(dirOut.toString(), baseOutputFileName);
+        Path outputFile = Paths.get(dirOut.toString(), outputFileName);
         try (PrintStream stream = new PrintStream(new BufferedOutputStream(Files.newOutputStream(outputFile, StandardOpenOption.CREATE)))) {
             printOutParameters(stream);
             stream.flush();
