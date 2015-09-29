@@ -4,6 +4,7 @@ import edu.cmu.tetrad.data.CovarianceMatrixOnTheFly;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.search.FastGes;
+import edu.cmu.tetrad.search.FastImages2;
 import edu.cmu.tetrad.search.IndependenceTest;
 import edu.cmu.tetrad.search.PcStable;
 import edu.pitt.dbmi.ccd.algorithm.Algorithm;
@@ -15,6 +16,8 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.util.TetradIndependenceTestFactory;
 import java.io.PrintStream;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -30,6 +33,53 @@ public class TetradAlgorithm implements Algorithm {
 
     public TetradAlgorithm() {
         this.executionOutput = null;
+    }
+
+    @Override
+    public void run(Class algorithm, Class testOfIndependence, List<Dataset> datasets, Parameters parameters) throws AlgorithmException {
+        if (algorithm == null) {
+            throw new IllegalArgumentException("Algorithm class is required.");
+        }
+        if (datasets == null || datasets.isEmpty()) {
+            throw new IllegalArgumentException("TetradDataSet is required.");
+        }
+        if (parameters == null) {
+            throw new IllegalArgumentException("Parameters are required.");
+        }
+
+        if (algorithm == FastImages2.class) {
+            // get parameters
+            Double pd = (Double) parameters.getParameter(GesParams.PENALTY_DISCOUNT);
+            double penaltyDiscount = (pd == null) ? 2.0 : pd;
+            Integer d = (Integer) parameters.getParameter(GesParams.DEPTH);
+            int depth = (d == null) ? 3 : d;
+            Boolean f = (Boolean) parameters.getParameter(GesParams.FAITHFUL);
+            boolean faithful = (f == null) ? false : f;
+            Boolean v = (Boolean) parameters.getParameter(GesParams.VERBOSE);
+            boolean verbose = (v == null) ? false : v;
+
+            List<DataSet> imageDatasets = new LinkedList<>();
+            datasets.forEach(dataset -> {
+                imageDatasets.add((DataSet) dataset.getDataSet());
+            });
+
+            FastImages2 fastImages = new FastImages2(imageDatasets, true);
+            fastImages.setPenaltyDiscount(penaltyDiscount);
+            fastImages.setDepth(depth);
+            fastImages.setNumPatternsToStore(0);  // always set to zero
+            fastImages.setFaithfulnessAssumed(faithful);
+            fastImages.setVerbose(verbose);
+            if (executionOutput != null) {
+                fastImages.setOut(executionOutput);
+            }
+
+            graph = fastImages.search();
+            if (executionOutput != null) {
+                executionOutput.println();
+            }
+        } else {
+            throw new IllegalArgumentException(String.format("Unknow algorithm class %s.", algorithm.getName()));
+        }
     }
 
     @Override
