@@ -174,7 +174,7 @@ public class FastImagesApp {
                 Files.createDirectory(dirOut);
             }
 
-            files.addAll(getFiles(dirOut, prefix));
+            files.addAll(getFiles(dataDir, prefix));
         } catch (IOException exception) {
             exception.printStackTrace(System.err);
             System.exit(-128);
