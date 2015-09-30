@@ -122,7 +122,7 @@ public class TetradAlgorithm implements Algorithm {
         } else if (algorithm == FastGes.class) {
             // get parameters
             Double pd = (Double) parameters.getParameter(GesParams.PENALTY_DISCOUNT);
-            double penaltyDiscount = (pd == null) ? 2.0 : pd;
+            double penaltyDiscount = (pd == null) ? 4.0 : pd;
             Integer d = (Integer) parameters.getParameter(GesParams.DEPTH);
             int depth = (d == null) ? 3 : d;
             Boolean f = (Boolean) parameters.getParameter(GesParams.FAITHFUL);
