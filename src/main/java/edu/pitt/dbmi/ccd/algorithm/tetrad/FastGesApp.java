@@ -107,7 +107,7 @@ public class FastGesApp {
         dataFile = null;
         dirOut = Paths.get(".");
         delimiter = '\t';
-        penaltyDiscount = 2.0;
+        penaltyDiscount = 4.0;
         depth = 3;
         verbose = Boolean.FALSE;
         baseOutputFileName = null;

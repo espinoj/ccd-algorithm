@@ -121,7 +121,7 @@ public class FastImagesApp {
         dirOut = Paths.get(".");
         delimiter = '\t';
         penaltyDiscount = 2.0;
-        depth = 3;
+        depth = -1;
         verbose = Boolean.FALSE;
         baseOutputFileName = null;
         isOutputGraphml = Boolean.FALSE;
@@ -184,7 +184,7 @@ public class FastImagesApp {
 
         // create output file
         if (baseOutputFileName == null) {
-            baseOutputFileName = String.format("fast_image_%d", System.currentTimeMillis());
+            baseOutputFileName = String.format("fast_imaGES_%d", System.currentTimeMillis());
         }
         String outputFileName = baseOutputFileName + ".txt";
 
