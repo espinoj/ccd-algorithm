@@ -35,6 +35,24 @@ public class ArgsUtil {
     private ArgsUtil() {
     }
 
+    public static double getDoubleValue(String[] args, int index, String flag) {
+        return Double.parseDouble(getParam(args, index, flag));
+    }
+
+    public static int getIntValue(String[] args, int index, String flag, int minimum) {
+        int value = getIntValue(args, index, flag);
+        if (value < minimum) {
+            throw new IllegalArgumentException(
+                    String.format("Value for switch %s must be a minimum of %d.", flag, minimum));
+        }
+
+        return value;
+    }
+
+    public static int getIntValue(String[] args, int index, String flag) {
+        return Integer.parseInt(getParam(args, index, flag));
+    }
+
     public static String getParam(String[] args, int index, String flag) {
         if (index >= args.length || args[index] == null || args[index].length() == 0) {
             throw new IllegalArgumentException(

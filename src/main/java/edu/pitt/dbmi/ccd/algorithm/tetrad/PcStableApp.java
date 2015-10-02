@@ -71,7 +71,7 @@ public class PcStableApp {
             + String.format("%-18s\t%s\n", OUT_PARAM, "Directory where results will be written to.  Current working directory is the default.")
             + String.format("%-18s\t%s\n", DELIM_PARAM, "A single character used to separate data in a line.  A tab character is the default.")
             + String.format("%-18s\t%s\n", ALPHA_PARAM, "The alpha value for the independence test.  The default value is 0.001.")
-            + String.format("%-18s\t%s\n", DEPTH_PARAM, "The search depth.  The default value is 3.")
+            + String.format("%-18s\t%s\n", DEPTH_PARAM, "The search depth.  The default value is 3, minimum value is -1.")
             + String.format("%-18s\t%s\n", VERBOSE_FLAG, "Output additional information from the algorithm.  No additional information by default.")
             + String.format("%-18s\t%s\n", OUT_FILENAME_PARAM, "The base name of the output files.  The algorithm's name with an integer timestamp is the default.");
 
@@ -120,10 +120,10 @@ public class PcStableApp {
                         delimiter = ArgsUtil.getCharacter(ArgsUtil.getParam(args, ++i, flag));
                         break;
                     case ALPHA_PARAM:
-                        alpha = new Double(ArgsUtil.getParam(args, ++i, flag));
+                        alpha = ArgsUtil.getDoubleValue(args, ++i, flag);
                         break;
                     case DEPTH_PARAM:
-                        depth = new Integer(ArgsUtil.getParam(args, ++i, flag));
+                        depth = ArgsUtil.getIntValue(args, ++i, flag, -1);
                         break;
                     case VERBOSE_FLAG:
                         verbose = Boolean.TRUE;
