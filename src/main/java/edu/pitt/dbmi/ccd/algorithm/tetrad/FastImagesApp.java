@@ -44,13 +44,13 @@ import java.util.List;
  * Sep 29, 2015 1:43:53 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
+ * @author Chirayu Kong Wongchokprasitti (chw20@pitt.edu)
  */
 public class FastImagesApp {
 
     private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.FastImagesApp "
-            + "--data-dir"
-            + "[--prefix]"
+            + "--data <file> "
             + "[--out <dir>] "
             + "[--delimiter <char>] "
             + "[--penalty-discount <double>] "
@@ -59,9 +59,7 @@ public class FastImagesApp {
             + "[--graphml] "
             + "[--out-filename <string>]";
 
-    private static final String DATA_DIR_PARAM = "--data-dir";
-
-    private static final String PREFIX_PARAM = "--prefix";
+    private static final String DATA_PARAM = "--data";
 
     private static final String OUT_PARAM = "--out";
 
@@ -78,8 +76,7 @@ public class FastImagesApp {
     private static final String GRAPHML_FLAG = "--graphml";
 
     private static final String HELP_INFO = "================================================================================\n"
-            + String.format("%-18s\t%s\n", DATA_DIR_PARAM, "Directory containing the data.")
-            + String.format("%-18s\t%s\n", PREFIX_PARAM, "The prefix of the image files.  The subfix should be the file number.")
+            + String.format("%-18s\t%s\n", DATA_PARAM, "The input data file.")
             + String.format("%-18s\t%s\n", OUT_PARAM, "Directory where results will be written to.  Current working directory is the default.")
             + String.format("%-18s\t%s\n", DELIM_PARAM, "A single character used to separate data in a line.  A tab character is the default.")
             + String.format("%-18s\t%s\n", PENALTY_DISCOUNT_PARAM, "Penality discount.  The default value is 2.0.")
@@ -88,9 +85,7 @@ public class FastImagesApp {
             + String.format("%-18s\t%s\n", GRAPHML_FLAG, "Output graphml formatted file.")
             + String.format("%-18s\t%s\n", OUT_FILENAME_PARAM, "The base name of the output files.  The algorithm's name with an integer timestamp is the default.");
 
-    private static Path dataDir;
-
-    private static String prefix;
+    private static Path[] dataFile;
 
     private static Path dirOut;
 
@@ -116,8 +111,7 @@ public class FastImagesApp {
             System.exit(-127);
         }
 
-        dataDir = null;
-        prefix = null;
+        dataFile = null;
         dirOut = Paths.get(".");
         delimiter = '\t';
         penaltyDiscount = 2.0;
@@ -128,13 +122,18 @@ public class FastImagesApp {
         try {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
+                System.out.println(flag);
                 switch (flag) {
-                    case DATA_DIR_PARAM:
-                        dataDir = ArgsUtil.getPathDir(ArgsUtil.getParam(args, ++i, flag), true);
-                        break;
-                    case PREFIX_PARAM:
-                        prefix = ArgsUtil.getParam(args, ++i, flag);
-                        break;
+	                case DATA_PARAM:
+	                	Path[] newDataFile = new Path[dataFile == null?1:dataFile.length+1];
+	                	if(dataFile != null){
+	                		System.arraycopy(dataFile, 0, newDataFile, 0, dataFile.length);
+	                	}
+	                	Path dataset = ArgsUtil.getPathFile(ArgsUtil.getParam(args, ++i, flag));
+	                	System.out.println(dataset);
+	                	newDataFile[newDataFile.length-1] = dataset;
+	                	dataFile = newDataFile;
+	                    break;
                     case OUT_PARAM:
                         dirOut = ArgsUtil.getPathDir(ArgsUtil.getParam(args, ++i, flag), false);
                         break;
@@ -160,8 +159,8 @@ public class FastImagesApp {
                         throw new Exception(String.format("Unknown switch: %s.\n", flag));
                 }
             }
-            if (dataDir == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_DIR_PARAM));
+            if (dataFile == null) {
+                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_PARAM));
             }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
@@ -174,7 +173,10 @@ public class FastImagesApp {
                 Files.createDirectory(dirOut);
             }
 
-            files.addAll(getFiles(dataDir, prefix));
+            //files.addAll(getFiles(dataDir, prefix));
+            for(Path path : dataFile){
+            	files.add(path);
+            }
         } catch (IOException exception) {
             exception.printStackTrace(System.err);
             System.exit(-128);
@@ -233,7 +235,7 @@ public class FastImagesApp {
         stream.println();
     }
 
-    private static List<Path> getFiles(Path dir, String prefix) throws IOException {
+    /*private static List<Path> getFiles(Path dir, String prefix) throws IOException {
         List<Path> files = new LinkedList<>();
 
         if (prefix == null) {
@@ -262,6 +264,6 @@ public class FastImagesApp {
         }
 
         return files;
-    }
+    }*/
 
 }
