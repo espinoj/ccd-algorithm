@@ -44,13 +44,13 @@ import java.util.List;
  * Sep 29, 2015 1:43:53 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
+ * @author Chirayu Kong Wongchokprasitti (chw20@pitt.edu)
  */
 public class FastImagesApp {
 
     private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
             + "edu.pitt.dbmi.ccd.algorithm.tetrad.FastImagesApp "
-            + "--data-dir"
-            + "[--prefix]"
+            + "--data <file> "
             + "[--out <dir>] "
             + "[--delimiter <char>] "
             + "[--penalty-discount <double>] "
@@ -59,9 +59,7 @@ public class FastImagesApp {
             + "[--graphml] "
             + "[--out-filename <string>]";
 
-    private static final String DATA_DIR_PARAM = "--data-dir";
-
-    private static final String PREFIX_PARAM = "--prefix";
+    private static final String DATA_PARAM = "--data";
 
     private static final String OUT_PARAM = "--out";
 
@@ -78,8 +76,7 @@ public class FastImagesApp {
     private static final String GRAPHML_FLAG = "--graphml";
 
     private static final String HELP_INFO = "================================================================================\n"
-            + String.format("%-18s\t%s\n", DATA_DIR_PARAM, "Directory containing the data.")
-            + String.format("%-18s\t%s\n", PREFIX_PARAM, "The prefix of the image files.  The subfix should be the file number.  For an example: data.txt.1,data.txt.2,data.txt.3; the prefix is data.txt")
+            + String.format("%-18s\t%s\n", DATA_PARAM, "Comma-separated list of dataset. Ex. data1.txt,data2.txt,data3.txt")
             + String.format("%-18s\t%s\n", OUT_PARAM, "Directory where results will be written to.  Current working directory is the default.")
             + String.format("%-18s\t%s\n", DELIM_PARAM, "A single character used to separate data in a line.  A tab character is the default.")
             + String.format("%-18s\t%s\n", PENALTY_DISCOUNT_PARAM, "Penality discount.  The default value is 2.0.")
@@ -88,9 +85,7 @@ public class FastImagesApp {
             + String.format("%-18s\t%s\n", GRAPHML_FLAG, "Output graphml formatted file.")
             + String.format("%-18s\t%s\n", OUT_FILENAME_PARAM, "The base name of the output files.  The algorithm's name with an integer timestamp is the default.");
 
-    private static Path dataDir;
-
-    private static String prefix;
+    private static List<Path> files;
 
     private static Path dirOut;
 
@@ -116,9 +111,7 @@ public class FastImagesApp {
             System.exit(-127);
         }
 
-        dataDir = null;
-        prefix = null;
-        dirOut = Paths.get(".");
+        files = new LinkedList<>();
         delimiter = '\t';
         penaltyDiscount = 2.0;
         depth = -1;
@@ -129,11 +122,8 @@ public class FastImagesApp {
             for (int i = 0; i < args.length; i++) {
                 String flag = args[i];
                 switch (flag) {
-                    case DATA_DIR_PARAM:
-                        dataDir = ArgsUtil.getPathDir(ArgsUtil.getParam(args, ++i, flag), true);
-                        break;
-                    case PREFIX_PARAM:
-                        prefix = ArgsUtil.getParam(args, ++i, flag);
+                    case DATA_PARAM:
+                        files.addAll(ArgsUtil.getFiles(ArgsUtil.getParam(args, ++i, flag).split(",")));
                         break;
                     case OUT_PARAM:
                         dirOut = ArgsUtil.getPathDir(ArgsUtil.getParam(args, ++i, flag), false);
@@ -160,27 +150,10 @@ public class FastImagesApp {
                         throw new Exception(String.format("Unknown switch: %s.\n", flag));
                 }
             }
-            if (dataDir == null) {
-                throw new IllegalArgumentException(String.format("Switch %s is required.", DATA_DIR_PARAM));
-            }
         } catch (Exception exception) {
             exception.printStackTrace(System.err);
             System.exit(-127);
         }
-
-        List<Path> files = new LinkedList<>();
-        try {
-            if (Files.notExists(dirOut)) {
-                Files.createDirectory(dirOut);
-            }
-
-            files.addAll(getFiles(dataDir, prefix));
-        } catch (IOException exception) {
-            exception.printStackTrace(System.err);
-            System.exit(-128);
-        }
-
-        System.out.println(files);
 
         // create output file
         if (baseOutputFileName == null) {

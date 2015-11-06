@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Utility class to help parse inputs from command line.
@@ -33,6 +35,16 @@ import java.nio.file.Paths;
 public class ArgsUtil {
 
     private ArgsUtil() {
+    }
+
+    public static List<Path> getFiles(String... files) throws FileNotFoundException {
+        List<Path> fileList = new LinkedList<>();
+
+        for (String file : files) {
+            fileList.add(getPathFile(file));
+        }
+
+        return fileList;
     }
 
     public static double getDoubleValue(String[] args, int index, String flag) {
