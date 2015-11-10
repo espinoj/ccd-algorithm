@@ -34,19 +34,16 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 /**
- * FastGES has been renamed to FGS due to license issues. This class will be
- * removed in future releases.
+ * Fast Greedy Search (FGS) application.
  *
- * Feb 26, 2015 1:59:33 PM
+ * Nov 10, 2015 2:43:43 PM
  *
- * @see edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-@Deprecated
-public class FastGesApp {
+public class FgsApp {
 
     private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
-            + "edu.pitt.dbmi.ccd.algorithm.tetrad.FastGesApp "
+            + "edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp "
             + "--data <file> "
             + "[--out <dir>] "
             + "[--delimiter <char>] "
@@ -167,7 +164,7 @@ public class FastGesApp {
 
         // create output file
         if (baseOutputFileName == null) {
-            baseOutputFileName = String.format("ges_%d", System.currentTimeMillis());
+            baseOutputFileName = String.format("fgs_%d", System.currentTimeMillis());
         }
         String outputFileName = baseOutputFileName + ".txt";
 
