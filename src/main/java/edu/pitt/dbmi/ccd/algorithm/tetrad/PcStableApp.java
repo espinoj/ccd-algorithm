@@ -186,6 +186,10 @@ public class PcStableApp {
     }
 
     private static void printOutParameters(PrintStream stream) {
+        stream.println("Datasets:");
+        stream.println(dataFile.getFileName().toString());
+        stream.println();
+
         stream.println("Graph Parameters:");
         stream.println(String.format("depth = %d", depth));
         stream.println(String.format("alpha = %f", alpha));

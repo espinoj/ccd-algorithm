@@ -200,6 +200,12 @@ public class FastImagesApp {
     }
 
     private static void printOutParameters(PrintStream stream) {
+        stream.println("Datasets:");
+        files.forEach(file -> {
+            stream.println(file.getFileName().toString());
+        });
+        stream.println();
+
         stream.println("Graph Parameters:");
         stream.println(String.format("penalty discount = %f", penaltyDiscount));
         stream.println(String.format("depth = %s", depth));
