@@ -1,6 +1,6 @@
 ## What is CCD Algorithm
 
-CCD Algorithm is a Java application that provides an CLI and API for algorithms produced by the Center for Causal Discovery
+CCD Algorithm is a Java application that provides an CLI and API for algorithms produced by the Center for Causal Discovery.  The application currently includes the algorithm(s):  FGS (Fast Greedy Search)
 
 
 ## How can I use it?
