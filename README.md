@@ -5,17 +5,6 @@ CCD Algorithm is a Java application that provides an CLI and API for algorithms 
 
 ## How can I use it?
 
-## Dependencies
-(not necessary if built with the -Denv=cli option which creates an uber jar)
-* colt-1.2.0.jar
-* commons-collections-3.1.jar
-* commons-math3-3.3.jar
-* jama-1.0.2.jar
-* lib-tetrad-0.4.1.jar
-* mtj-0.9.14.jar
-* pal-1.5.1.jar
-* xom-1.1.jar
-
 #### Run as an Application
 
 ```
@@ -79,3 +68,15 @@ Path outputFile = Paths.get("fgs_graph.txt");
 Graph graph = algorithm.getGraph();
 GraphIO.write(graph, GraphIO.GraphOutputType.TETRAD, outputFile);
 ```
+
+
+## Dependencies
+(not necessary if built with the -Denv=cli option which creates an uber jar)
+* colt-1.2.0.jar
+* commons-collections-3.1.jar
+* commons-math3-3.3.jar
+* jama-1.0.2.jar
+* lib-tetrad-0.4.1.jar
+* mtj-0.9.14.jar
+* pal-1.5.1.jar
+* xom-1.1.jar
