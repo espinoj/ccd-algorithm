@@ -1,11 +1,11 @@
 ## What is CCD Algorithm
 
-CCD Algorithm is a Java application that provides an API interface to run a collection of algorithms that are found in Tetrad and others. 
+CCD Algorithm is a Java application that provides an CLI and API for algorithms produced by the Center for Causal Discovery
 
 
 ## How can I use it?
 
-#### Required Dependencies
+## Dependencies (not necessary if built with the -Denv=cli option which creates an uber jar)
 * colt-1.2.0.jar
 * commons-collections-3.1.jar
 * commons-math3-3.3.jar
@@ -15,9 +15,19 @@ CCD Algorithm is a Java application that provides an API interface to run a coll
 * pal-1.5.1.jar
 * xom-1.1.jar
 
-Put all the dependency jars along with ccd-algorithm-0.4.3.jar in a lib folder
-
 #### Run as an Application
+
+Usage: java -cp ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data <file> [--out <dir>] [--delimiter <char>] [--penalty-discount <double>] [--depth <int>] [--verbose] [--graphml] [--out-filename <string>]
+================================================================================
+--data            	The input data file.
+--out             	Directory where results will be written to.  Current working directory is the default.
+--delimiter       	A single character used to separate data in a line.  A tab character is the default.
+--penalty-discount	Penality discount.  The default value is 4.0.
+--depth           	The search depth.  The default value is 3, minimum value is -1.
+--verbose         	Output additional information from the algorithm.  No additional information by default.
+--graphml         	Output graphml formatted file.
+--out-filename    	The base name of the output files.  The algorithm's name with an integer timestamp is the default.
+
 
 ##### Create Simulated Dataset
 ```java
