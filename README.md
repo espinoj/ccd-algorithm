@@ -5,7 +5,8 @@ CCD Algorithm is a Java application that provides an CLI and API for algorithms 
 
 ## How can I use it?
 
-## Dependencies (not necessary if built with the -Denv=cli option which creates an uber jar)
+## Dependencies
+(not necessary if built with the -Denv=cli option which creates an uber jar)
 * colt-1.2.0.jar
 * commons-collections-3.1.jar
 * commons-math3-3.3.jar
@@ -17,6 +18,7 @@ CCD Algorithm is a Java application that provides an CLI and API for algorithms 
 
 #### Run as an Application
 
+```
 Usage: java -cp ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data <file> [--out <dir>] [--delimiter <char>] [--penalty-discount <double>] [--depth <int>] [--verbose] [--graphml] [--out-filename <string>]
 ================================================================================
 --data            	The input data file.
@@ -27,7 +29,7 @@ Usage: java -cp ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --da
 --verbose         	Output additional information from the algorithm.  No additional information by default.
 --graphml         	Output graphml formatted file.
 --out-filename    	The base name of the output files.  The algorithm's name with an integer timestamp is the default.
-
+```
 
 ##### Create Simulated Dataset
 ```java
