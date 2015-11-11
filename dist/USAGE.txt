@@ -1,0 +1,27 @@
+    ccd-algorithm is a Java application that provides an CLI and API for algorithms produced by the Center for Causal Discovery
+    Copyright (C) 2015 University of Pittsburgh and Carnegie Mellon University
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+Usage: java -cp ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data <file> [--out <dir>] [--delimiter <char>] [--penalty-discount <double>] [--depth <int>] [--verbose] [--graphml] [--out-filename <string>]
+================================================================================
+--data            	The input data file.
+--out             	Directory where results will be written to.  Current working directory is the default.
+--delimiter       	A single character used to separate data in a line.  A tab character is the default.
+--penalty-discount	Penalty discount.  The default value is 4.0.
+--depth           	The search depth.  The default value is 3, minimum value is -1.
+--verbose         	Output additional information from the algorithm.  No additional information by default.
+--graphml         	Output graphml formatted file.
+--out-filename    	The base name of the output files.  The algorithm's name with an integer timestamp is the default.
