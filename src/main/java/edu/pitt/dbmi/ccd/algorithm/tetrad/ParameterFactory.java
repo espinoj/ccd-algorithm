@@ -19,8 +19,7 @@
 package edu.pitt.dbmi.ccd.algorithm.tetrad;
 
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
-import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.GesParams;
-import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.PcStableParams;
+import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param.FgsParams;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,21 +63,12 @@ public class ParameterFactory {
 
     }
 
-    public static Parameters buildPcStableParameters(Double alpha, Integer depth, Boolean verbose) {
-        Map<String, Object> params = new HashMap<>();
-        params.put(PcStableParams.ALPHA, alpha);
-        params.put(PcStableParams.DEPTH, depth);
-        params.put(PcStableParams.VERBOSE, verbose);
-
-        return wrapParameters(params);
-    }
-
     public static Parameters buildGesParameters(Double penaltyDiscount, Integer depth, Boolean faithful, Boolean verbose) {
         final Map<String, Object> params = new HashMap<>();
-        params.put(GesParams.FAITHFUL, faithful);
-        params.put(GesParams.PENALTY_DISCOUNT, penaltyDiscount);
-        params.put(GesParams.VERBOSE, verbose);
-        params.put(GesParams.DEPTH, depth);
+        params.put(FgsParams.FAITHFUL, faithful);
+        params.put(FgsParams.PENALTY_DISCOUNT, penaltyDiscount);
+        params.put(FgsParams.VERBOSE, verbose);
+        params.put(FgsParams.DEPTH, depth);
 
         return wrapParameters(params);
     }

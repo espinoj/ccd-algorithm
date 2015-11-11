@@ -24,7 +24,7 @@ package edu.pitt.dbmi.ccd.algorithm.tetrad.algo.param;
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
-public interface GesParams extends TetradParams {
+public interface FgsParams extends TetradParams {
 
     /**
      * True if we assume the graph is faithful (exclude zero correlation edges).

@@ -26,6 +26,8 @@ package edu.pitt.dbmi.ccd.algorithm;
  */
 public class AlgorithmException extends Exception {
 
+    private static final long serialVersionUID = -4499534787415930143L;
+
     public AlgorithmException() {
     }
 
@@ -44,4 +46,5 @@ public class AlgorithmException extends Exception {
     public AlgorithmException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
+
 }
