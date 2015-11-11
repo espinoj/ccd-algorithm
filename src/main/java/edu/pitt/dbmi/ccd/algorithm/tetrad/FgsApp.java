@@ -178,7 +178,7 @@ public class FgsApp {
             dataset.readDataFile(dataFile, delimiter, true);
 
             // build the parameters
-            Parameters params = ParameterFactory.buildGesParameters(penaltyDiscount, depth, true, verbose);
+            Parameters params = ParameterFactory.buildFgsParameters(penaltyDiscount, depth, true, verbose);
 
             Algorithm algorithm = new TetradAlgorithm();
             algorithm.setExecutionOutput(stream);

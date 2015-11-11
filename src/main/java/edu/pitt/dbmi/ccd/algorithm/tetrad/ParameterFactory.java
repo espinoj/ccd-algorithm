@@ -63,7 +63,7 @@ public class ParameterFactory {
 
     }
 
-    public static Parameters buildGesParameters(Double penaltyDiscount, Integer depth, Boolean faithful, Boolean verbose) {
+    public static Parameters buildFgsParameters(Double penaltyDiscount, Integer depth, Boolean faithful, Boolean verbose) {
         final Map<String, Object> params = new HashMap<>();
         params.put(FgsParams.FAITHFUL, faithful);
         params.put(FgsParams.PENALTY_DISCOUNT, penaltyDiscount);
