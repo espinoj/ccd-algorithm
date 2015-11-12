@@ -23,12 +23,12 @@ Usage: java -cp ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --da
 ##### Create Simulated Dataset
 ```java
 // create dataset with 20 variables, 100 cases, and 1 edge per node
-java -cp lib/ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.SimulateDataApp --var 20 --case 100 --edge 1 --out output/
+java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.SimulateDataApp --var 20 --case 100 --edge 1 --out output/
 ```
 
 ##### Run FGS
 ```java
-java -cp lib/ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data data.txt --delimiter $'\t' --penalty-discount 4.0 --depth 3 --verbose --out output/
+java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data data.txt --delimiter $'\t' --penalty-discount 4.0 --depth 3 --verbose --out output/
 ```
 
 #### Use as an API
