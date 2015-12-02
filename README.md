@@ -31,6 +31,29 @@ java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.SimulateData
 java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data data.txt --delimiter $'\t' --penalty-discount 4.0 --depth 3 --verbose --out output/
 ```
 
+##### Example output using known data
+Download this dataset
+[Retention.txt](https://www.dropbox.com/s/v7zvvj9ej0oitc9/Retention.txt?dl=0)
+
+Run FGS
+```java
+java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data Retention.txt --delimiter $'\t' --penalty-discount 4.0 --depth 3 --verbose --out output/
+```
+
+Inspect the output which should show a graph with the following edges
+```
+Graph Edges: 
+1. fac_salary --- spending_per_stdt
+2. spending_per_stdt --> rjct_rate
+3. spending_per_stdt --- stdt_tchr_ratio
+4. stdt_accept_rate --- fac_salary
+5. stdt_clss_stndng --> rjct_rate
+6. tst_scores --- fac_salary
+7. tst_scores --- grad_rate
+8. tst_scores --- spending_per_stdt
+9. tst_scores --- stdt_clss_stndng
+```
+
 #### Use as an API
 
 ##### Input
