@@ -25,6 +25,7 @@ import edu.pitt.dbmi.ccd.algorithm.tetrad.algo.TetradAlgorithm;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.data.TetradDataSet;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.graph.GraphIO;
 import edu.pitt.dbmi.ccd.algorithm.util.ArgsUtil;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -35,23 +36,41 @@ import java.nio.file.StandardOpenOption;
 
 /**
  * Fast Greedy Search (FGS) application.
- *
+ * <p/>
  * Nov 10, 2015 2:43:43 PM
  *
  * @author Kevin V. Bui (kvb2@pitt.edu)
  */
 public class FgsApp {
 
-    private static final String USAGE = "Usage: java -cp ccd-algorithm.jar "
-            + "edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp "
-            + "--data <file> "
-            + "[--out <dir>] "
-            + "[--delimiter <char>] "
-            + "[--penalty-discount <double>] "
-            + "[--depth <int>] "
-            + "[--verbose] "
-            + "[--graphml] "
-            + "[--out-filename <string>]";
+    private static final String USAGE =
+            "    ccd-algorithm is a Java application that provides an CLI and API for algorithms produced by the Center for Causal Discovery\n" +
+                    "    Copyright (C) 2015 University of Pittsburgh and Carnegie Mellon University\n" +
+                    "\n" +
+                    "    This program is free software; you can redistribute it and/or modify\n" +
+                    "    it under the terms of the GNU General Public License as published by\n" +
+                    "    the Free Software Foundation; either version 2 of the License, or\n" +
+                    "    (at your option) any later version.\n" +
+                    "\n" +
+                    "    This program is distributed in the hope that it will be useful,\n" +
+                    "    but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+                    "    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
+                    "    GNU General Public License for more details.\n" +
+                    "\n" +
+                    "    You should have received a copy of the GNU General Public License along\n" +
+                    "    with this program; if not, write to the Free Software Foundation, Inc.,\n" +
+                    "    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n\n" +
+
+                    "Usage: java -cp ccd-algorithm.jar "
+                    + "edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp "
+                    + "--data <file> "
+                    + "[--out <dir>] "
+                    + "[--delimiter <char>] "
+                    + "[--penalty-discount <double>] "
+                    + "[--depth <int>] "
+                    + "[--verbose] "
+                    + "[--graphml] "
+                    + "[--out-filename <string>]";
 
     private static final String DATA_PARAM = "--data";
 
@@ -73,12 +92,11 @@ public class FgsApp {
             + String.format("%-18s\t%s\n", DATA_PARAM, "The input data file.")
             + String.format("%-18s\t%s\n", OUT_PARAM, "Directory where results will be written to.  Current working directory is the default.")
             + String.format("%-18s\t%s\n", DELIM_PARAM, "A single character used to separate data in a line.  A tab character is the default.")
-            + String.format("%-18s\t%s\n", PENALTY_DISCOUNT_PARAM, "Penality discount.  The default value is 4.0.")
+            + String.format("%-18s\t%s\n", PENALTY_DISCOUNT_PARAM, "Penalty discount.  The default value is 4.0.")
             + String.format("%-18s\t%s\n", DEPTH_PARAM, "The search depth.  The default value is 3, minimum value is -1.")
             + String.format("%-18s\t%s\n", VERBOSE_FLAG, "Output additional information from the algorithm.  No additional information by default.")
             + String.format("%-18s\t%s\n", GRAPHML_FLAG, "Output graphml formatted file.")
             + String.format("%-18s\t%s\n", OUT_FILENAME_PARAM, "The base name of the output files.  The algorithm's name with an integer timestamp is the default.");
-
     private static Path dataFile;
 
     private static Path dirOut;
