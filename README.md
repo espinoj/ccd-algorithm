@@ -1,46 +1,44 @@
 ## What is CCD Algorithm
 
-CCD Algorithm is a Java application that provides an CLI and API for algorithms produced by the Center for Causal Discovery.  The application currently includes the algorithm(s):  FGS (Fast Greedy Search)
+CCD Algorithm is a Java application that provides a command-line interface (CLI) and application programming interface (API) for causal discovery algorithms produced by the Center for Causal Discovery.  The application currently includes the algorithm(s):  
+* FGS (Fast Greedy Search) - this is an optimization of the Greedy Equivalence Search algorithm	(GES,	Meek	1995;	Chickering	2003).  The optimizations are described in http://arxiv.org/ftp/arxiv/papers/1507/1507.07749.pdf
+
+Causal discovery algorithms are a class of search algorithms that explore a space of graphical causal models, i.e., graphical models where directed edges imply causation, for a model (or models) that best fit a dataset.  We suggest that newcomers to the field review Causation, Prediction and Search by Spirtes, Glymour and Scheines for a primer on the subject.
 
 
 ## How can I use it?
 
-#### Run as an Application
+### Run as an Application
 
-```
-Usage: java -cp ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data <file> [--out <dir>] [--delimiter <char>] [--penalty-discount <double>] [--depth <int>] [--verbose] [--graphml] [--out-filename <string>]
-================================================================================
---data            	The input data file.
---out             	Directory where results will be written to.  Current working directory is the default.
---delimiter       	A single character used to separate data in a line.  A tab character is the default.
---penalty-discount	Penality discount.  The default value is 4.0.
---depth           	The search depth.  The default value is 3, minimum value is -1.
---verbose         	Output additional information from the algorithm.  No additional information by default.
---graphml         	Output graphml formatted file.
---out-filename    	The base name of the output files.  The algorithm's name with an integer timestamp is the default.
-```
-
-##### Create Simulated Dataset
+#### Create Simulated Dataset
 ```java
 // create dataset with 20 variables, 100 cases, and 1 edge per node
 java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.SimulateDataApp --var 20 --case 100 --edge 1 --out output/
 ```
-
-##### Run FGS
-```java
-java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data data.txt --delimiter $'\t' --penalty-discount 4.0 --depth 3 --verbose --out output/
+The program will simulate at dataset (100 cases) derived from a graph of 20 nodes with an average of 1 edge per pair of nodes to a directory called output.  The name of the file has the following format 
+```
+sim_data_<# of variables>vars_<# of cases>cases_<system timestamp>.txt"
 ```
 
-##### Example output using known data
-Download this dataset
-[Retention.txt](https://www.dropbox.com/s/v7zvvj9ej0oitc9/Retention.txt?dl=0)
+#### Run FGS
+```java
+java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data <file to analyze e.g., Retention.txt or simulated data from above> --delimiter $'\t' --penalty-discount 4.0 --depth 3 --verbose --out output/
+```
+
+The program will output the results as a text file (in this example to the directory output).   The beginning of the file contains the algorithm parameters used in the search.  "
+
+For FGS, elapsed getEffectEdges = XXms" refers to the amount of time it took to evaluate all pairs of variables for correlation.  The file then details each step taken in the greedy search procedure i.e., insertion or deletion of edges based on a scoring function (i.e., BIC difference).
+
+### Run an example output using known data
+Download this file which is a dataset containing information on college graduation and used in the publication "What Do College Ranking Data Tell Us About Student Retention?" by Drudzel and Glymour, 1994
+[Retention.txt](http://www.ccd.pitt.edu/wp-content/uploads/files/Retention.txt)
 
 Run FGS
 ```java
 java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data Retention.txt --delimiter $'\t' --penalty-discount 4.0 --depth 3 --verbose --out output/
 ```
 
-Inspect the output which should show a graph with the following edges
+Inspect the output which should show a graph with the following edges. 
 ```
 Graph Edges: 
 1. fac_salary --- spending_per_stdt
@@ -52,6 +50,12 @@ Graph Edges:
 7. tst_scores --- grad_rate
 8. tst_scores --- spending_per_stdt
 9. tst_scores --- stdt_clss_stndng
+```
+
+Here is a key to the edge types
+```
+A---B There is causal relationship between variable A and B but we cannot determine the direction of the relationship
+A-->B There is a causal relationship from variable A to B
 ```
 
 #### Use as an API
@@ -92,6 +96,19 @@ Graph graph = algorithm.getGraph();
 GraphIO.write(graph, GraphIO.GraphOutputType.TETRAD, outputFile);
 ```
 
+#### Usage
+```
+Usage: java -cp ccd-algorithm.jar edu.pitt.dbmi.ccd.algorithm.tetrad.FgsApp --data <file> [--out <dir>] [--delimiter <char>] [--penalty-discount <double>] [--depth <int>] [--verbose] [--graphml] [--out-filename <string>]
+================================================================================
+--data            	The input data file.
+--out             	Directory where results will be written to.  Current working directory is the default.
+--delimiter       	A single character used to separate data in a line.  A tab character is the default.
+--penalty-discount	Penality discount.  The default value is 4.0.
+--depth           	The search depth.  The default value is 3, minimum value is -1.
+--verbose         	Output additional information from the algorithm.  No additional information by default.
+--graphml         	Output graphml formatted file.
+--out-filename    	The base name of the output files.  The algorithm's name with an integer timestamp is the default.
+```
 
 ## Dependencies
 (not necessary if built with the -Denv=cli option which creates an uber jar)
