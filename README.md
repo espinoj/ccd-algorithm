@@ -38,8 +38,8 @@ A-->B There is a causal relationship from variable A to B
 ```
 
 ### Run an example output using known data
-Download this file which is a dataset containing information on college graduation and used in the publication "What Do College Ranking Data Tell Us About Student Retention?" by Drudzel and Glymour, 1994
-[Retention.txt](http://www.ccd.pitt.edu/wp-content/uploads/files/Retention.txt)
+Download the this file, [Retention.txt](http://www.ccd.pitt.edu/wp-content/uploads/files/Retention.txt), which is a dataset containing information on college graduation and used in the publication "What Do College Ranking Data Tell Us About Student Retention?" by Drudzel and Glymour, 1994.
+
 
 Run FGS
 ```java
