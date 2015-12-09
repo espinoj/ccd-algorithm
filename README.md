@@ -17,7 +17,7 @@ Causal discovery algorithms allow a user to uncover the causal relationships bet
 // create dataset with 20 variables, 100 cases, and 1 edge per node
 java -cp ccd-algorithm-0.4.3.jar edu.pitt.dbmi.ccd.algorithm.tetrad.SimulateDataApp --var 20 --case 100 --edge 1 --out output/
 ```
-The program will simulate at dataset (100 cases) derived from a graph of 20 nodes with an average of 1 edge per node to a directory called output.  The name of the file has the following format 
+The program will simulate at dataset (100 cases) derived from a graph of 20 nodes with an average of 1 edge per node to a directory called output.  The name of the file has the following format.
 ```
 sim_data_<# of variables>vars_<# of cases>cases_<system timestamp>.txt"
 ```
