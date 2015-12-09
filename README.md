@@ -65,8 +65,6 @@ Graph Edges:
 #### Use as an API
 
 ```java
-package edu.pitt.dbmi.ccd.algorithm;
-
 import edu.cmu.tetrad.search.FastGes;
 import edu.pitt.dbmi.ccd.algorithm.data.Parameters;
 import edu.pitt.dbmi.ccd.algorithm.tetrad.ParameterFactory;
