@@ -1,7 +1,7 @@
 ## What is CCD Algorithm
 
 CCD Algorithm is a Java application that provides a command-line interface (CLI) and application programming interface (API) for causal discovery algorithms produced by the Center for Causal Discovery.  The application currently includes the algorithm(s):  
-* FGS (Fast Greedy Search) - this is an optimization of the Greedy Equivalence Search algorithm	(GES,	Meek	1995;	Chickering	2003).  The optimizations are described in http://arxiv.org/ftp/arxiv/papers/1507/1507.07749.pdf
+* FGS (Fast Greedy Search) - this is an optimization of the Greedy Equivalence Search algorithm	(GES,	Meek	1995;	Chickering	2003).  The optimizations are described in [*Scaling up	Greedy Causal Search for Continuous Variables]( http://arxiv.org/ftp/arxiv/papers/1507/1507.07749.pdf).
 
 Causal discovery algorithms are a class of search algorithms that explore a space of graphical causal models, i.e., graphical models where directed edges imply causation, for a model (or models) that are a good fit for a dataset.  We suggest that newcomers to the field review [*Causation, Prediction and Search*](http://www.cs.cmu.edu/afs/cs.cmu.edu/project/learn-43/lib/photoz/.g/scottd/
 fullbook.pdf) by Spirtes, Glymour and Scheines for a primer on the subject.
